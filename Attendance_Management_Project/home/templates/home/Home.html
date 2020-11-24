@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <title>Home</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Shreyhas Yachamaneni">
+  <script src="float-panel.js"></script>
+
+  <!-- CSS Import -->
+  <link rel="stylesheet" href="{% static 'bootstrap_3.4/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/customstyle.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet" type = "text/css">
+
+  <!-- js import -->
+  <script src="{% static 'bootstrap_3.4/js/bootstrap.min.js' %}"></script>
+
+  <!-- jQuery import -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+  <style type = "text/css">
+    body {
+    font-size = 100%;
+    font-family: 'Ubuntu', sans-serif;
+    }
+
+    .jumbotron {
+      background-color: #7395ae;
+      color:#fefefe;
+
+    }
+
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    .navbar-custom {
+      background-color: #7395ae;
+    }
+    /*Changing font color of navbar*/
+    .navbar-custom .navbar-nav > li > a {
+    color: #fefefe;
+    }
+
+
+    /* Add a gray background color and some padding to the footer */
+    footer {
+      background-color: #7395ae;
+      padding: 25px;
+    }
+
+  .carousel-inner img {
+      width: 100%; /* Set width to 100% */
+      margin: auto;
+      min-height:200px;
+  }
+
+  .logo {
+      font-size: 150px;
+  }
+  .gi-1-5x{font-size: 1.5em;}
+  .gi-2x{font-size: 2em;}
+  .gi-3x{font-size: 3em;}
+  .gi-4x{font-size: 4em;}
+  .gi-5x{font-size: 5em;}
+  .gi-7x{font-size: 7em;}
+  .gi-10x{font-size: 10em;}
+
+  .form-group {
+        margin-bottom: 30px;
+  }
+
+
+.about-border {
+    display: block;
+    width: 150px;
+    height: 3px;
+    background: #5d5c61;
+    margin: 10px auto;
+}
+
+/*align the heading text*/
+.about h1, .about h2 {
+   text-align: center;
+}
+
+  </style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="login/"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class = 'jumbotron'>
+<div class = "jumbotron text-center">
+  <h1>Attendance Management System</h1>
+  <p>Streamline repetitive processes. Decrease Costs. Be more efficient.</p>
+
+</div>
+</div>
+
+
+<div class="container text-center form-group">
+  <h3><strong>Say Hello to Faster Management</strong></h3><br>
+  <div class="about-border"></div>
+</div>
+
+<div class = 'container'>
+  <div class="row form-group">
+    <div class="col-lg-2">
+      <span class = "glyphicon glyphicon-ok gi-5x"></span>
+    </div>
+    <div class="col-lg-4">
+      <p><h4><strong>Straightforward Transition</strong></strong></h4><br>We understand that transitioning between systems can get confusing. ____'s attendance system makes it extremely easy to import student and staff data.</p>
+    </div>
+    <div class="col-lg-2">
+      <span class = "glyphicon glyphicon-barcode gi-5x"></span>
+    </div>
+    <div class="col-lg-4">
+      <p><h4><strong>Easy Access</strong></h4><br>____ can be accessed anywhere, anytime. The robust platform can also be easily accessed by teachers and students alike, allowing for efficient data input</p>
+    </div>
+  </div>
+  <br>
+  <div class="row form-group">
+    <div class="col-lg-2 col-sm-4">
+      <span class = "glyphicon glyphicon-time gi-5x"></span>
+    </div>
+    <div class="col-lg-4 col-sm-8">
+      <p><h4><strong>Increase Efficiency</strong></h4><br>Through ____, staff can record attendance data with no hassle. Features are also included for assistant coordinators and administrators. Staff members can also push notifications to necessary individuals.</p>
+    </div>
+    <div class="col-lg-2 col-sm-4">
+      <span class = "glyphicon glyphicon-retweet gi-5x"></span>
+    </div>
+    <div class="col-lg-4 col-sm-8">
+      <p><h4><strong>Automations</strong></h4><br>___ saves time through its numerous automatic features. Absentees will automatically receive notifications, and teachers will be notified as well, wasting less time looking around for students.</p>
+    </div>
+  </div>
+</div><br>
+
+
+<footer class="container-fluid text-center">
+  <p>Computer Science IA SL</p>
+</footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>

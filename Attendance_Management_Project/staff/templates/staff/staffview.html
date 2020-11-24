@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <title>{{name}}</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Shreyhas Yachamaneni">
+  <script src="float-panel.js"></script>
+
+  <!-- CSS Import -->
+  <link rel="stylesheet" href="{% static 'bootstrap_3.4/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/customstyle.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet" type = "text/css">
+
+  <!-- jQuery, Popper, js import -->
+  <script src="{% static 'jquery/jquery-3.5.1.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="{% static 'bootstrap_3.4/js/bootstrap.min.js' %}"></script>
+
+
+  <script type="text/javascript">
+    window.CSRF_TOKEN = "{{ csrf_token }}";
+  </script>
+
+
+</head>
+<body>
+
+<!-- Navbar -->
+<div class = 'container-fluid'>
+<nav class = 'navbar'>
+  <!-- Navbar Logo -->
+  <div class="navbar-header">
+     <a class="navbar-brand" href="{% url 'loginview' %}">
+       <img src = "{% static 'images/Logo.png' %}" alt = "Logo" style="width:60px;height:50px;">
+     </a>
+  </div>
+  <u1 class = "nav navbar-nav">
+
+  </u1>
+  <u1 class = "nav navbar-nav navbar-right">
+    <li><a href = "#">User ID: {{user_id}}</a></li>
+    <li><a href = #>{{rolename}}</a></li>
+    <li class = "dropdown">
+      <a class = "dropdown-toggle" data-toggle="dropdown" href = "">{{name}}<span class = "caret"></span></a>
+    <ul class = "dropdown-menu">
+      <li><a class = 'btn btn-danger' href = "{% url 'logout' %}">Sign Out</a></li>
+    </ul>
+    </li>
+
+  </u1>
+</nav>
+</div>
+
+<!-- Attendance and Date -->
+<div class = 'container-fluid'>
+
+<div class = 'row'>
+
+  <!-- Attendance -->
+  <div class = 'col-lg-8'>
+    <!-- Date Picker -->
+    <div class="container-fluid text-center">
+      <input type="date" value = "{{fdate}}" id = "datepicker" name = "datepicker">
+    </div>
+
+    <!-- Attendance Form -->
+    <div class = "container-fluid">
+    <form method = "post" action = "{% url 'record' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table class="table table-striped table-bordered" id="attendancedata">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Student Name</th>
+          <th scope="col">
+            Grade
+          </th>
+          <th scope="col">Attendance</th>
+        </tr>
+      </thead>
+      <tbody id = 'tbody' >
+        {% for student in attendancestudents %}
+          <tr>
+            <th scope="row">{{student.studentref.id}}</th>
+            <td>{{student.studentref.name}}</td>
+            <td>{{student.studentref.grade}}</td>
+            <td>
+                 <input id="student{{student.studentref.id}}" name = 'attendance' value = {{student.studentref.id}}
+                 type = 'checkbox' {% if student.attendance %} checked {% endif %}>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button class = 'btn btn-primary' type = 'submit'>Save</button>
+    </form>
+    </div>
+
+    <!-- Export -->
+    <div class = 'container-fluid'>
+
+        <button data-toggle="modal" data-target="#exportmodal" class="btn btn-primary">Export</button>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exportmodal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h3 class="modal-title" id="lineModalLabel">Export Attendance Data</h3>
+                </div>
+                <div class="modal-body">
+
+                    <!-- Content of Modal -->
+                    <form method = "post" action = "{% url 'export' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                      <!-- Grades -->
+                      <div class="form-group">
+                        <label><strong>Grades</strong></label>
+                        <div class="checkbox">
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>KG</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>1</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>2</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>3</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>4</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>5</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>6</label>
+                        </div>
+                        <div class="checkbox">
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>7</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>8</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>9</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>10</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>11</label>
+                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>12</label>
+                        </div>
+
+                      </div>
+
+                      <div class="form-group">
+                        <label for="exampleInputFile">File input</label>
+                        <input type="file" id="exampleInputFile">
+                        <p class="help-block">Example block-level help text here.</p>
+                      </div>
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox"> Check me out
+                        </label>
+                      </div>
+                      <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group btn-group-justified" role="group" aria-label="group button">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"  role="button">Close</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" id="exportbutton" class="btn btn-default btn-hover-green" class = "form-control">Export</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+
+    </div>
+  </div>
+
+  <!-- Grade Selector, Viz, and Notifications -->
+  <div class = 'col-lg-4 text-center'>
+  <div class = 'container-fluid'>
+    <!-- Grade Selector -->
+      <h5><strong>Grade Selector</strong></h5>
+      <div class = 'row'>
+        <p>
+        <button type="button" class="btn btn-secondary grade-button" id = "0" value = "0">KG</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "1" value = "1">1</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "2" value = "2">2</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "3" value = "3">3</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "4" value = "4">4</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "5" value = "5">5</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "6" value = "6">6</button>
+        </p>
+      </div>
+      <div class = 'row'>
+        <p>
+        <button type="button" class="btn btn-secondary grade-button" id = "7" value = "7">7</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "8" value = "8">8</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "9" value = "9">9</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "10" value = "10">10</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "11" value = "11">11</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "12" value = "12">12</button>
+        <button type="button" class="btn btn-secondary grade-button" id = "All" value = "13">All</button>
+        </p>
+    </div>
+
+    <!-- Data Viz -->
+    <div class = 'row'>
+      <div class = 'panel panel-default'>Attendance Policy Data Vizualization Here</div>
+    </div>
+    <!-- Notifications -->
+    <div class = 'row'>
+      <div class = 'panel panel-default'>Notifications</div>
+    </div>
+  </div>
+  </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+<!-- Date Change JS -->
+<script>
+$(document).ready(function () {
+  $("#datepicker").change(function() {
+    $.ajax({
+      url:'/changedate/',
+      method: 'post',
+      data: {
+        date: $("#datepicker").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $.fn.populatetable(data);
+      }
+    });
+  });
+
+$.fn.populatetable = function(data) {
+  console.log(data);
+  students = data['attendancestudents'];
+  $table = "";
+  for (i=0; i<students.length; i++) {
+
+    var student = students[i];
+    console.log(student);
+    var studentref_id = student['studentref_id']
+    var studentref_name = student['studentref_name']
+    var studentref_grade = student['studentref_grade']
+    var attendance = student['attendance']
+    console.log(attendance);
+    var checked_string = '';
+    if(attendance){
+      checked_string = 'checked';
+    }
+    console.log(checked_string);
+    $table +=   "<tr> <th scope = 'row'>" + studentref_id + "</th>\
+                 <td>" + studentref_name + "</td>\
+                 <td>" + studentref_grade + "</td>\
+                 <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + " > </td></tr>";
+  }
+
+  $('#tbody').html($table)
+}
+});
+
+</script>
+
+<!-- Grade Selector JS -->
+<script>
+$(document).ready(function () {
+
+  $(".grade-button").click(function() {
+    console.log($(this).val());
+    $.ajax({
+      url:'/changegrade/',
+      method: 'post',
+      data: {
+        date: $("#datepicker").val(),
+        grade: $(this).val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $.fn.populategradetable(data);
+      }
+    });
+  });
+
+  $.fn.populategradetable = function(data) {
+    students = data['attendancestudents'];
+    $table = " ";
+    for (i=0; i<students.length; i++) {
+
+      var student = students[i];
+      var studentref_id = student['studentref_id']
+      var studentref_name = student['studentref_name']
+      var studentref_grade = student['studentref_grade']
+      var attendance = student['attendance']
+      var checked_string = '';
+        if(attendance){
+          checked_string = 'checked';
+        }
+      $table +=   "<tr> <th scope = 'row'>" + studentref_id + "</th>\
+                   <td>" + studentref_name + "</td>\
+                   <td>" + studentref_grade + "</td>\
+                   <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + " > </td></tr>";
+
+    }
+
+    $('#tbody').html($table)
+  }
+});
+
+</script>
+
+
+
+</body>
+</html>
+
