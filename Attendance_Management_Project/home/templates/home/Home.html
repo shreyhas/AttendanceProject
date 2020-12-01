@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   {% load static %}
-  <title>Home</title>
-  <meta charset="utf-8">
+  <title>{{name}}</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="Shreyhas Yachamaneni">
   <script src="float-panel.js"></script>
@@ -14,26 +14,19 @@
   <link rel="stylesheet" href="{% static 'css/customstyle.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet" type = "text/css">
 
-  <!-- js import -->
+  <!-- jQuery, Popper, js import -->
+  <script src="{% static 'jquery/jquery-3.5.1.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="{% static 'bootstrap_3.4/js/bootstrap.min.js' %}"></script>
 
-  <!-- jQuery import -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 
-  <style type = "text/css">
-    body {
-    font-size = 100%;
-    font-family: 'Ubuntu', sans-serif;
-    }
+  <script type="text/javascript">
+    window.CSRF_TOKEN = "{{ csrf_token }}";
+  </script>
 
-    .jumbotron {
-      background-color: #7395ae;
-      color:#fefefe;
+  <style>
 
-    }
-
-    .navbar {
+        .navbar {
       margin-bottom: 0;
       border-radius: 0;
     }
@@ -45,49 +38,13 @@
     color: #fefefe;
     }
 
-
-    /* Add a gray background color and some padding to the footer */
-    footer {
+    .jumbotron {
       background-color: #7395ae;
-      padding: 25px;
+      color: #fefefe;
     }
 
-  .carousel-inner img {
-      width: 100%; /* Set width to 100% */
-      margin: auto;
-      min-height:200px;
-  }
-
-  .logo {
-      font-size: 150px;
-  }
-  .gi-1-5x{font-size: 1.5em;}
-  .gi-2x{font-size: 2em;}
-  .gi-3x{font-size: 3em;}
-  .gi-4x{font-size: 4em;}
-  .gi-5x{font-size: 5em;}
-  .gi-7x{font-size: 7em;}
-  .gi-10x{font-size: 10em;}
-
-  .form-group {
-        margin-bottom: 30px;
-  }
-
-
-.about-border {
-    display: block;
-    width: 150px;
-    height: 3px;
-    background: #5d5c61;
-    margin: 10px auto;
-}
-
-/*align the heading text*/
-.about h1, .about h2 {
-   text-align: center;
-}
-
   </style>
+
 </head>
 
 <body>
@@ -104,6 +61,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav navbar-right">
+        <li><a href="gatepass/">Gate Pass Request</a></li>
         <li><a href="login/"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
       </ul>
     </div>
@@ -156,12 +114,9 @@
   </div>
 </div><br>
 
-
 <footer class="container-fluid text-center">
-  <p>Computer Science IA SL</p>
+
 </footer>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 </html>

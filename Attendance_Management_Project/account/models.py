@@ -7,6 +7,8 @@ class Teacher(models.Model):
     name = models.CharField(max_length=30)
     phone = models.CharField(max_length=12)
     email = models.CharField(max_length=60)
+    is_coordinator = models.BooleanField(default=False, help_text="Select only if Teacher is Coordinator.")
+    grades = models.CharField(max_length=15, null = True, help_text ="Separate grades by commas.")
 
     def __str__(self):
         return f'{self.name}'

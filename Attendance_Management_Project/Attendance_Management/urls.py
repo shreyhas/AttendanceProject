@@ -21,11 +21,16 @@ import login.views
 import staff.views
 import classes.views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home.views.home, name ='home'),
     path('login/', login.views.login, name ="login"),
     path('logout/', login.views.logout, name ="logout"),
+    path('requests/', login.views.requests, name = "requests"),
+    path('verifyemail/', login.views.verifyemail, name = "verifyemail"),
+    path('verifyotp/', login.views.verifyotp, name = "verifyotp"),
+    path('parentrequest/', login.views.parentrequest, name = "parentrequest"),
     path('staff/', staff.views.loginview, name ="loginview"),
     path('classdetails/<int:class_id>/<int:teacherclass_id>', classes.views.classdetails, name="classdetails"),
     path('save/<int:class_id>', classes.views.save, name="save"),

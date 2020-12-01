@@ -10,61 +10,93 @@
   <script src="float-panel.js"></script>
 
   <!-- CSS Import -->
-  <link rel="stylesheet" href="{% static 'bootstrap_3.4/css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="{% static 'css/customstyle.css' %}">
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet" type = "text/css">
+  <link rel="stylesheet" href="{% static 'bootstrap_4.0.0/css/bootstrap.css' %}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
 
   <!-- jQuery, Popper, js import -->
   <script src="{% static 'jquery/jquery-3.5.1.min.js' %}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="{% static 'bootstrap_3.4/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'bootstrap_4.0.0/js/bootstrap.min.js' %}"></script>
 
 
   <script type="text/javascript">
     window.CSRF_TOKEN = "{{ csrf_token }}";
   </script>
 
+  <style>
+  .vertical-align-middle {
+    vertical-align: middle;
+}
+a { color: inherit; }
 
+.padding-bottom-3 {
+    padding-bottom: 3px;
+}
+.input-date { width: 300px}
+.input-date-sm { width: 200px}
+
+
+
+  </style>
 </head>
 <body>
-
 <!-- Navbar -->
-<div class = 'container-fluid'>
-<nav class = 'navbar'>
-  <!-- Navbar Logo -->
-  <div class="navbar-header">
-     <a class="navbar-brand" href="{% url 'loginview' %}">
-       <img src = "{% static 'images/Logo.png' %}" alt = "Logo" style="width:60px;height:50px;">
-     </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="{% url 'loginview' %}">
+    <img src = "{% static 'images/Logo.png' %}" alt = "Logo" style="width:60px;height:50px;">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto">
+      <button type = "button" class="dropdown-item" href="#" disabled>User ID: {{user_id}}</button>
+      <div class="btn-group">
+        <button type="button" class="btn bg-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{name}}<span class = "caret"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+        </div>
+      </div>
+      <button type="button" class="btn bg-light" data-container="body" data-toggle="popover" data-trigger = "focus" data-placement="bottom" data-content = "Notifications Here">
+        <span class="material-icons">mail</span>
+      </button>
+      <button type="button" class="btn bg-light">
+        <span class="material-icons">help</span>
+      </button>
+      <a href = "{% url 'logout' %}"><button type = "button" class = 'btn btn-danger'>
+            <i class="material-icons vertical-align-middle padding-bottom-3">login</i>
+      </button></a>
+    </div>
   </div>
-  <u1 class = "nav navbar-nav">
-
-  </u1>
-  <u1 class = "nav navbar-nav navbar-right">
-    <li><a href = "#">User ID: {{user_id}}</a></li>
-    <li><a href = #>{{rolename}}</a></li>
-    <li class = "dropdown">
-      <a class = "dropdown-toggle" data-toggle="dropdown" href = "">{{name}}<span class = "caret"></span></a>
-    <ul class = "dropdown-menu">
-      <li><a class = 'btn btn-danger' href = "{% url 'logout' %}">Sign Out</a></li>
-    </ul>
-    </li>
-
-  </u1>
 </nav>
+<p></p>
+
+<div class="text-right">
+  <div class="btn-group" role="group" aria-label="Features">
+    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#exportmodal">
+      <span class = "material-icons">download</span>
+    </button>
+    <a href="{% url 'classview' %}"><button type="button" class="btn btn-sm bg-grey">
+      <span class = "material-icons">book</span>
+    </button></a>
+  </div>
 </div>
 
-<!-- Attendance and Date -->
 <div class = 'container-fluid'>
-
+<!-- Attendance and Date -->
 <div class = 'row'>
 
   <!-- Attendance -->
   <div class = 'col-lg-8'>
     <!-- Date Picker -->
-    <div class="container-fluid text-center">
-      <input type="date" value = "{{fdate}}" id = "datepicker" name = "datepicker">
+    <div class="container-fluid">
+    <div class="form-group row justify-content-center">
+        <input class="form-control input-date" type="date" value="{{fdate}}" id="datepicker" name="datepicker">
     </div>
+    </div>
+
 
     <!-- Attendance Form -->
     <div class = "container-fluid">
@@ -99,126 +131,132 @@
     </form>
     </div>
 
-    <!-- Export -->
-    <div class = 'container-fluid'>
 
-        <button data-toggle="modal" data-target="#exportmodal" class="btn btn-primary">Export</button>
-
-
-        <!-- Modal -->
-        <div class="modal fade" id="exportmodal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                    <h3 class="modal-title" id="lineModalLabel">Export Attendance Data</h3>
-                </div>
-                <div class="modal-body">
-
-                    <!-- Content of Modal -->
-                    <form method = "post" action = "{% url 'export' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                      <!-- Grades -->
-                      <div class="form-group">
-                        <label><strong>Grades</strong></label>
-                        <div class="checkbox">
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>KG</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>1</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>2</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>3</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>4</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>5</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>6</label>
-                        </div>
-                        <div class="checkbox">
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>7</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>8</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>9</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>10</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>11</label>
-                          <label class = "checkbox-inline"><input class = 'grade-select' type="checkbox" checked>12</label>
-                        </div>
-
-                      </div>
-
-                      <div class="form-group">
-                        <label for="exampleInputFile">File input</label>
-                        <input type="file" id="exampleInputFile">
-                        <p class="help-block">Example block-level help text here.</p>
-                      </div>
-                      <div class="checkbox">
-                        <label>
-                          <input type="checkbox"> Check me out
-                        </label>
-                      </div>
-                      <button type="submit" class="btn btn-default">Submit</button>
-                    </form>
-
-                </div>
-                <div class="modal-footer">
-                    <div class="btn-group btn-group-justified" role="group" aria-label="group button">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-default" data-dismiss="modal"  role="button">Close</button>
-                        </div>
-                        <div class="btn-group" role="group">
-                            <button type="button" id="exportbutton" class="btn btn-default btn-hover-green" class = "form-control">Export</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-
-
-    </div>
   </div>
 
   <!-- Grade Selector, Viz, and Notifications -->
-  <div class = 'col-lg-4 text-center'>
-  <div class = 'container-fluid'>
-    <!-- Grade Selector -->
+  <div class = 'col-lg-4'>
+
+
+    <div class = 'container-fluid text-center'>
+      <!-- Grade Selector -->
+      <br><br>
       <h5><strong>Grade Selector</strong></h5>
-      <div class = 'row'>
-        <p>
-        <button type="button" class="btn btn-secondary grade-button" id = "0" value = "0">KG</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "1" value = "1">1</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "2" value = "2">2</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "3" value = "3">3</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "4" value = "4">4</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "5" value = "5">5</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "6" value = "6">6</button>
-        </p>
+      <div class="form-group">
+        <select class="form-control" id="gradeselect" name="gradeselect">
+        <option class="grade-button" id = "0" value = "0">KG</option>
+        <option class="grade-button" id = "1" value = "1">1</option>
+        <option class="grade-button" id = "2" value = "2">2</option>
+        <option class="grade-button" id = "3" value = "3">3</option>
+        <option class="grade-button" id = "4" value = "4">4</option>
+        <option class="grade-button" id = "5" value = "5">5</option>
+        <option class="grade-button" id = "6" value = "6">6</option>
+        <option class="grade-button" id = "7" value = "7">7</option>
+        <option class="grade-button" id = "8" value = "8">8</option>
+        <option class="grade-button" id = "9" value = "9">9</option>
+        <option class="grade-button" id = "10" value = "10">10</option>
+        <option class="grade-button" id = "11" value = "11">11</option>
+        <option class="grade-button" id = "12" value = "12">12</option>
+        <option class="grade-button" id = "13" value = "13">All</option>
+      </select>
       </div>
-      <div class = 'row'>
-        <p>
-        <button type="button" class="btn btn-secondary grade-button" id = "7" value = "7">7</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "8" value = "8">8</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "9" value = "9">9</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "10" value = "10">10</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "11" value = "11">11</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "12" value = "12">12</button>
-        <button type="button" class="btn btn-secondary grade-button" id = "All" value = "13">All</button>
-        </p>
     </div>
 
     <!-- Data Viz -->
     <div class = 'row'>
       <div class = 'panel panel-default'>Attendance Policy Data Vizualization Here</div>
     </div>
-    <!-- Notifications -->
-    <div class = 'row'>
-      <div class = 'panel panel-default'>Notifications</div>
-    </div>
-  </div>
-  </div>
 
   </div>
 </div>
 
+</div>
 
 
 
+<!-- Export Modal -->
+<div id = "exportmodal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Export Attendance Data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label><strong>Grades</strong></label>
+          <div class="form-check">
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '0'>KG</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '1'>1</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '2'>2</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '3'>3</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '4'>4</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '5'>5</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '6'>6</label>
+          </div>
+          </div>
+          <div class="form-check">
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '7'>7</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '8'>8</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '9'>9</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '10'>10</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '11'>11</label>
+          </div>
+          <div class="form-check-inline">
+            <label class = "form-check-label"><input name = 'grade-select' class="form-check-input" type="checkbox" checked value = '12'>12</label>
+          </div>
+          </div>
+        </div>
+        <!-- Date -->
+        <div class="form-group">
+          <label><strong>Date</strong></label>
+          <div class="form-group row">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-control input-date-sm" type="date" value="{{fdate}}">
+          </div>
+        </div>
+        <!-- Message -->
+        <div class="form-group">
+          <p>The file exported will be named as follows: export_YYYY-MM-DD</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" id="exportbutton" class="btn btn-primary">Export</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Popover Script -->
+<script>
+  $(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+  });
+</script>
 
 <!-- Date Change JS -->
 <script>
@@ -271,17 +309,18 @@ $.fn.populatetable = function(data) {
 <script>
 $(document).ready(function () {
 
-  $(".grade-button").click(function() {
-    console.log($(this).val());
+  $('[name=gradeselect]').change(function() {
+    console.log($('[name=gradeselect]').val());
     $.ajax({
       url:'/changegrade/',
       method: 'post',
       data: {
         date: $("#datepicker").val(),
-        grade: $(this).val(),
+        grade: $('[name=gradeselect]').val(),
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
+        console.log(data)
         $.fn.populategradetable(data);
       }
     });
@@ -314,6 +353,11 @@ $(document).ready(function () {
 
 </script>
 
+<script>
+var elem = document.createElement("hr");
+elem.setAttribute("width", "100px");
+document.body.appendChild(elem);
+</script>
 
 
 </body>

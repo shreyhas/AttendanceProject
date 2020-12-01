@@ -1,122 +1,57 @@
     body {
         font-size = 100%;
         font-family: 'Ubuntu', sans-serif;
-        background-color: #fefefe
-        color: #fff
+        background-color: #fefefe;
+
     }
 
 
-  /* Add a gray background color and some padding to the footer */
-  footer {
-    background-color: #7395ae;
-    padding: 25px;
-  }
 
-  .gi-1-5x{font-size: 1.5em;}
-  .gi-2x{font-size: 2em;}
-  .gi-3x{font-size: 3em;}
-  .gi-4x{font-size: 4em;}
-  .gi-5x{font-size: 5em;}
-  .gi-7x{font-size: 7em;}
-  .gi-10x{font-size: 10em;}
+    .gi-1-5x{font-size: 1.5em;}
+    .gi-2x{font-size: 2em;}
+    .gi-3x{font-size: 3em;}
+    .gi-4x{font-size: 4em;}
+    .gi-5x{font-size: 5em;}
+    .gi-7x{font-size: 7em;}
+    .gi-10x{font-size: 10em;}
 
-  /* Navbar Styling */
-  .dropdown-menu {
-    padding: 5px;
-  }
-  .dropdown-menu li {
-    padding: 5px;
-  }
+    /* Navbar Styling */
 
-  .form-group {
-    margin-bottom: 30px;
-  }
 
-  .about-border {
-    display: block;
-    width: 150px;
-    height: 3px;
-    background: #5d5c61;
-    margin: 10px auto;
-  }
 
-  .padding-up {
-    padding-top: 10px
-  }
-
-  /* Optional CSS to center align the heading text*/
-  .about h1, .about h2 {
-    text-align: center;
-  }
-
-body.my-login-page {
-        background-color: #f7f9fb;
-        font-size: 14px;
+    .dropdown-menu {
+        padding: 5px;
+    }
+    .dropdown-menu li {
+        padding: 5px;
     }
 
-    .my-login-page .brand {
-        width: 90px;
-        height: 90px;
-        overflow: hidden;
-        border-radius: 50%;
-        margin: 40px auto;
-        box-shadow: 0 4px 8px rgba(0,0,0,.05);
-        position: relative;
-        z-index: 1;
-    }
-
-    .my-login-page .brand img {
-        width: 100%;
-    }
-
-    .my-login-page .card-wrapper {
-        width: 500px;
-    }
-
-    .my-login-page .card {
-        border-color: transparent;
-        box-shadow: 0 4px 8px rgba(0,0,0,.05);
-    }
-
-    .my-login-page .card.fat {
-        padding: 10px;
-    }
-
-    .my-login-page .card .card-title {
+    .form-group {
         margin-bottom: 30px;
     }
 
-    .my-login-page .form-control {
-        border-width: 2.3px;
+    .about-border {
+        display: block;
+        width: 150px;
+        height: 3px;
+        background: #5d5c61;
+        margin: 10px auto;
     }
 
-    .my-login-page .form-group label {
-        width: 100%;
+    .padding-up {
+        padding-top: 10px
     }
 
-    .my-login-page .btn.btn-block {
-        padding: 12px 10px;
-    }
-
-    .my-login-page .footer {
-        margin: 40px 0;
-        color: #888;
+    /* Optional CSS to center align the heading text*/
+    .about h1, .about h2 {
         text-align: center;
     }
 
-    @media screen and (max-width: 425px) {
-        .my-login-page .card-wrapper {
-            width: 90%;
-            margin: 0 auto;
-        }
+        /* Add a gray background color and some padding to the footer */
+    footer {
+        background-color: #7395ae;
+        padding: 25px;
     }
 
-    @media screen and (max-width: 320px) {
-        .my-login-page .card.fat {
-            padding: 0;
-        }
 
-        .my-login-page .card.fat .card-body {
-            padding: 15px;
-        }
-    }
+
