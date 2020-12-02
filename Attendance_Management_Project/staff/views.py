@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from account.models import TeacherClass
@@ -96,12 +96,13 @@ def classview(request):
 @login_required
 def record(request):
     marked = request.POST.getlist('attendance')
+    date = request.POST.get('datepicker')
     print(marked)
 
     for i in range(len(marked)):
         marked[i] = int(marked[i])
 
-    students = AttendanceStudent.objects.all()
+    students = AttendanceStudent.objects.filter(date = date)
     for student in students:
         if student.studentref.id in marked:
             present_absent = True
@@ -186,7 +187,7 @@ def changegrade(request):
         name = request.user.staff.name
 
         if grade_selected == 13:
-            attendancestudent = AttendanceStudent.objects.all(date=date_selected)
+            attendancestudent = AttendanceStudent.objects.filter(date=date_selected)
         else:
             attendancestudent = AttendanceStudent.objects.filter(
                 studentref_grade=grade_selected,
@@ -297,3 +298,28 @@ def export(request):
 
     return response
 
+@login_required
+def savesettings(request):
+
+    school_start_date = datetime.strptime(request.POST.get('schoolstartdate'), '%Y-%m-%d')
+    school_end_date = datetime.strptime(request.POST.get('schoolenddate'),  '%Y-%m-%d')
+    students = Student.objects.filter(active = True)
+
+    print(school_end_date,school_start_date)
+    days = int((school_end_date-school_start_date).days) + 1
+
+    for i in range(days):
+        currentday = school_start_date + timedelta(days = i)
+        for student in students:
+            #create students with date
+            if AttendanceStudent.objects.filter(date = currentday) is not None:
+                AttendanceStudent.objects.create(
+                    studentref = student,
+                    studentref_name = student.name,
+                    studentref_grade = student.grade,
+                    attendance = False,
+                    date = currentday
+                )
+    response={}
+
+    return JsonResponse(response)

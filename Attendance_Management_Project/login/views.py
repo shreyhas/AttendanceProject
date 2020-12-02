@@ -30,7 +30,6 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return redirect('home')
-# Create your views here.
 
 def requests(request):
 

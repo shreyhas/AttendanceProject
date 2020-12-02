@@ -39,4 +39,5 @@ urlpatterns = [
     path('changedate/', staff.views.changedate, name="changedate"),
     path('changegrade/', staff.views.changegrade, name="changegrade"),
     path('export/', staff.views.export, name="export"),
+    path('savesettings/', staff.views.savesettings, name='savesettings')
 ]
