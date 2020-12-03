@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'classes.apps.ClassesConfig',
     'account.apps.AccountConfig',
     'staff.apps.StaffConfig',
+    'settings.apps.SettingsConfig',
 ]
 
 MIDDLEWARE = [

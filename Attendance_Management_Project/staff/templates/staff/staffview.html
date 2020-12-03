@@ -75,6 +75,9 @@ a { color: inherit; }
 
 <div class="text-right">
   <div class="btn-group" role="group" aria-label="Features">
+    <button type="button" class="btn btn-sm bg-grey">
+      <span class = "material-icons">upload</span>
+    </button>
     <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#settingsmodal">
       <span class = "material-icons">settings</span>
     </button>
@@ -187,6 +190,8 @@ a { color: inherit; }
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <form method = "post" action="{% url 'export' %}" enctype="multipart/form-data">
+      {% csrf_token %}
       <div class="modal-body">
         <div class="form-group">
           <label><strong>Grades</strong></label>
@@ -238,7 +243,7 @@ a { color: inherit; }
         <div class="form-group">
           <label><strong>Date</strong></label>
           <div class="form-group row">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-control input-date-sm" type="date" value="{{fdate}}">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-control input-date-sm" type="date" name = 'selectdate' value="{{fdate}}">
           </div>
         </div>
         <!-- Message -->
@@ -250,11 +255,12 @@ a { color: inherit; }
         <button type="submit" id="exportbutton" class="btn btn-primary">Export</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- Export Modal -->
+<!-- Settings Modal -->
 <div id = "settingsmodal" class="modal modal-xl" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -270,11 +276,11 @@ a { color: inherit; }
           <div class="form-group">
             <label><strong>Start Date</strong></label>
             <div class="form-group row">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name = "schoolstartdate" class="form-control input-date-sm" type="date">
+              <input name = "schoolstartdate" class="form-control input-date-sm" type="date">
             </div>
             <label><strong>End Date</strong></label>
             <div class="form-group row">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name = "schoolenddate" class="form-control input-date-sm" type="date">
+              <input name = "schoolenddate" class="form-control input-date-sm" type="date">
             </div>
           </div>
         </div>
@@ -389,11 +395,7 @@ $(document).ready(function () {
 
 </script>
 
-<script>
-var elem = document.createElement("hr");
-elem.setAttribute("width", "100px");
-document.body.appendChild(elem);
-</script>
+
 
 
 </body>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <title>{{name}}</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Shreyhas Yachamaneni">
+  <script src="float-panel.js"></script>
+
+  <!-- CSS Import -->
+  <link rel="stylesheet" href="{% static 'bootstrap_4.0.0/css/bootstrap.css' %}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+
+  <!-- jQuery, Popper, js import -->
+  <script src="{% static 'jquery/jquery-3.5.1.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="{% static 'bootstrap_4.0.0/js/bootstrap.min.js' %}"></script>
+
+
+  <script type="text/javascript">
+    window.CSRF_TOKEN = "{{ csrf_token }}";
+  </script>
+
+  <style>
+  .vertical-align-middle {
+    vertical-align: middle;
+}
+a { color: inherit; }
+
+.padding-bottom-3 {
+    padding-bottom: 3px;
+}
+.input-date { width: 300px}
+.input-date-sm { width: 200px}
+
+
+
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="{% url 'loginview' %}">
+    <img src = "{% static 'images/Logo.png' %}" alt = "Logo" style="width:60px;height:50px;">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto">
+      <button type = "button" class="dropdown-item" href="#" disabled>User ID: {{user_id}}</button>
+      <div class="btn-group">
+        <button type="button" class="btn bg-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{name}}<span class = "caret"></span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+        </div>
+      </div>
+      <button type="button" class="btn bg-light" data-container="body" data-toggle="popover" data-trigger = "focus" data-placement="bottom" data-content = "Notifications Here">
+        <span class="material-icons">mail</span>
+      </button>
+      <button type="button" class="btn bg-light">
+        <span class="material-icons">help</span>
+      </button>
+      <a href = "{% url 'logout' %}"><button type = "button" class = 'btn btn-danger'>
+            <i class="material-icons vertical-align-middle padding-bottom-3">login</i>
+      </button></a>
+    </div>
+  </div>
+</nav>
+
+<div class="btn-group" role="group" aria-label="Features">
+    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#studentsettingsmodal">
+      <span class = "material-icons">upload</span>
+    </button>
+    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#settingsmodal">
+      <span class = "material-icons">school</span>
+    </button>
+    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#exportmodal">
+      <span class = "material-icons">download</span>
+    </button>
+  </div>
+
+<!-- Settings Modal -->
+<div id = "settingsmodal" class="modal modal-xl" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Settings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method = "post" action = "{% url 'savesettings' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label><strong>Start Date</strong></label>
+            <div class="form-group row">
+              <input name = "schoolstartdate" class="form-control input-date-sm" type="date">
+            </div>
+            <label><strong>End Date</strong></label>
+            <div class="form-group row">
+              <input name = "schoolenddate" class="form-control input-date-sm" type="date">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="savebutton" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Student Settings Modal -->
+<div id = "studentsettingsmodal" class="modal modal-xl" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Settings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" action="{% url 'importstudents' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+        <div class="modal-body">
+          <label for="studentdata">Student Data Import</label>
+          <input id = 'studentdata' name = "studentdata" type="file">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="studentdatasavebutton" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

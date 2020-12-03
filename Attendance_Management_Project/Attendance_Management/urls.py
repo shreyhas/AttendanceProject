@@ -20,6 +20,7 @@ import home.views
 import login.views
 import staff.views
 import classes.views
+import settings.views
 
 
 urlpatterns = [
@@ -39,5 +40,7 @@ urlpatterns = [
     path('changedate/', staff.views.changedate, name="changedate"),
     path('changegrade/', staff.views.changegrade, name="changegrade"),
     path('export/', staff.views.export, name="export"),
-    path('savesettings/', staff.views.savesettings, name='savesettings')
+    path('savesettings/', staff.views.savesettings, name='savesettings'),
+    path('importstudents/', settings.views.importstudents, name='importstudents'),
+    path('staff/schoolsettings/', settings.views.schoolsettings, name='schoolsettings')
 ]
