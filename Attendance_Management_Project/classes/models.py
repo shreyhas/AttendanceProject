@@ -8,6 +8,8 @@ class Student(models.Model):
     email = models.CharField(max_length=100)
     grade = models.IntegerField()
     active = models.BooleanField(null=True, default=True)
+    fathers_email = models.EmailField(null=True)
+    mothers_email = models.EmailField(null=True)
 
     def __str__(self):
         return f'{self.name} {self.grade}'

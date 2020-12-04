@@ -298,35 +298,6 @@ def export(request):
 
     return response
 
-@login_required
-def savesettings(request):
-
-    if request.user.staff is not None:
-        school_start_date = datetime.strptime(request.POST.get('schoolstartdate'), '%Y-%m-%d')
-        school_end_date = datetime.strptime(request.POST.get('schoolenddate'),  '%Y-%m-%d')
-        students = Student.objects.filter(active = True)
-
-        days = int((school_end_date-school_start_date).days) + 1
-
-        for i in range(days):
-            currentday = school_start_date + timedelta(days = i)
-            for student in students:
-                #create students with date
-
-                if not AttendanceStudent.objects.filter(date = currentday, studentref = student).exists():
-                    AttendanceStudent.objects.create(
-                        studentref = student,
-                        studentref_name = student.name,
-                        studentref_grade = student.grade,
-                        attendance = False,
-                        date = currentday
-                    )
-
-        response={}
-    else:
-        response = {error}
-
-    return JsonResponse(response)
 
 
 

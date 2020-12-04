@@ -1,0 +1,57 @@
+    body {
+        font-size = 100%;
+        font-family: 'Ubuntu', sans-serif;
+        background-color: #fefefe;
+
+    }
+
+
+
+    .gi-1-5x{font-size: 1.5em;}
+    .gi-2x{font-size: 2em;}
+    .gi-3x{font-size: 3em;}
+    .gi-4x{font-size: 4em;}
+    .gi-5x{font-size: 5em;}
+    .gi-7x{font-size: 7em;}
+    .gi-10x{font-size: 10em;}
+
+    /* Navbar Styling */
+
+
+
+    .dropdown-menu {
+        padding: 5px;
+    }
+    .dropdown-menu li {
+        padding: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+    }
+
+    .about-border {
+        display: block;
+        width: 150px;
+        height: 3px;
+        background: #5d5c61;
+        margin: 10px auto;
+    }
+
+    .padding-up {
+        padding-top: 10px
+    }
+
+    /* Optional CSS to center align the heading text*/
+    .about h1, .about h2 {
+        text-align: center;
+    }
+
+        /* Add a gray background color and some padding to the footer */
+    footer {
+        background-color: #7395ae;
+        padding: 25px;
+    }
+
+
+

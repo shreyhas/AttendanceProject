@@ -78,13 +78,13 @@ a { color: inherit; }
     <button type="button" class="btn btn-sm bg-grey">
       <span class = "material-icons">upload</span>
     </button>
-    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#settingsmodal">
+    <a href = "{% url 'schoolsettings' %}"<button type="button" class="btn btn-sm bg-grey">
       <span class = "material-icons">settings</span>
-    </button>
+  </button></a>
     <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#exportmodal">
       <span class = "material-icons">download</span>
     </button>
-    <a href=""><button type="button" class="btn btn-sm bg-grey">
+    <a href="{% url 'classview' %}"><button type="button" class="btn btn-sm bg-grey">
       <span class = "material-icons">book</span>
     </button></a>
   </div>
@@ -260,38 +260,6 @@ a { color: inherit; }
   </div>
 </div>
 
-<!-- Settings Modal -->
-<div id = "settingsmodal" class="modal modal-xl" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Settings</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form method = "post" action = "{% url 'savesettings' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-        <div class="modal-body">
-          <div class="form-group">
-            <label><strong>Start Date</strong></label>
-            <div class="form-group row">
-              <input name = "schoolstartdate" class="form-control input-date-sm" type="date">
-            </div>
-            <label><strong>End Date</strong></label>
-            <div class="form-group row">
-              <input name = "schoolenddate" class="form-control input-date-sm" type="date">
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" id="savebutton" class="btn btn-primary">Save</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
 <!-- Popover Script -->
 <script>

@@ -28,7 +28,7 @@
   .vertical-align-middle {
     vertical-align: middle;
 }
-a { color: inherit; }
+
 
 .padding-bottom-3 {
     padding-bottom: 3px;
@@ -73,75 +73,377 @@ a { color: inherit; }
   </div>
 </nav>
 
-<div class="btn-group" role="group" aria-label="Features">
-    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#studentsettingsmodal">
-      <span class = "material-icons">upload</span>
-    </button>
-    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#settingsmodal">
-      <span class = "material-icons">school</span>
-    </button>
-    <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#exportmodal">
-      <span class = "material-icons">download</span>
-    </button>
-  </div>
+<div class = "container-fluid form-group">
+  <hr>
+<!--School Settings List Group-->
+<div class="row">
 
-<!-- Settings Modal -->
-<div id = "settingsmodal" class="modal modal-xl" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Settings</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+  <div class="col-3">
+    <div class="list-group" id="list-tab" role="tablist">
+      <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">School Options</h5>
+
+    </div>
+      <a class="list-group-item list-group-item-action active" id="list-schooldates-list" data-toggle="list" href="#list-schooldates" role="tab" aria-controls="home">School Start/End Dates</a>
+
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="list-schooldates" role="tabpanel" aria-labelledby="list-schooldates-list">
+        <div class = "container-fluid">
+          <form method = "post" action = "{% url 'schooldatesettings' %}" enctype="multipart/form-data">
+          {% csrf_token %}
+            <div class="modal-body">
+              <div class="form-group">
+                <label><strong>Start Date</strong></label>
+                <div class="form-group row">
+                  <input name = "schoolstartdate" class="form-control input-date-sm" type="date">
+                </div>
+                <label><strong>End Date</strong></label>
+                <div class="form-group row">
+                  <input name = "schoolenddate" class="form-control input-date-sm" type="date">
+                </div>
+                <small>Please limit use of this feature to the beginning of the school year.</small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="savebutton" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <form method = "post" action = "{% url 'savesettings' %}" enctype="multipart/form-data">
+    </div>
+  </div>
+</div>
+  <hr>
+<!--Student Settings List Group-->
+<div class="row">
+
+  <div class="col-3">
+    <div class="list-group" id="list-tab" role="tablist">
+      <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Student Options</h5>
+
+    </div>
+      <a class="list-group-item list-group-item-action active" id="list-importstudents-list" data-toggle="list" href="#list-importstudents" role="tab" aria-controls="home">Import Students</a>
+      <a class="list-group-item list-group-item-action" id="list-importparents-list" data-toggle="list" href="#list-importparents" role="tab" aria-controls="home">Import Parents</a>
+      <a class="list-group-item list-group-item-action" id="list-addstudents-list" data-toggle="list" href="#list-addstudents" role="tab" aria-controls="profile">Add Students</a>
+      <a class="list-group-item list-group-item-action" id="list-addparents-list" data-toggle="list" href="#list-addparents" role="tab" aria-controls="messages">Add Parents</a>
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="list-importstudents" role="tabpanel" aria-labelledby="list-importstudents-list">
+        <div class = "container-fluid">
+        <form method="post" action="{% url 'importstudents' %}" enctype="multipart/form-data">
       {% csrf_token %}
         <div class="modal-body">
-          <div class="form-group">
-            <label><strong>Start Date</strong></label>
-            <div class="form-group row">
-              <input name = "schoolstartdate" class="form-control input-date-sm" type="date">
+          <h6>Student Data Import</h6>
+          <input class = "form-control-sm" id = 'studentdata' name = "studentdata" type="file"><br>
+          <label for="studentdata"><small>&nbsp;&nbsp;Please use the template provided and ensure the file type is .xlsx</small></label>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="studentdataimportbutton" class="btn btn-primary">Upload</button>
+        </div>
+      </form>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="list-importparents" role="tabpanel" aria-labelledby="list-importparents-list">
+
+        <div class = "container-fluid">
+        <form method="post" action="{% url 'importparents' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <h6>Parent Data Import</h6>
+          <input class = "form-control-sm" id = 'parentdata' name = "parentdata" type="file"><br>
+          <label for="parentdata"><small>&nbsp;&nbsp;Please use the template provided and ensure the file type is .xlsx</small></label>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="parentdataimportbutton" class="btn btn-primary">Upload</button>
+        </div>
+      </form>
+        </div>
+
+      </div>
+      <div class="tab-pane fade" id="list-addstudents" role="tabpanel" aria-labelledby="list-addstudents-list">
+        <div class = "container-fluid">
+
+
+        <div class = "modal-header">
+          <h6>Add Student</h6>
+        </div>
+        <div class="modal-body">
+          <div class = "form-row">
+            <div class="form-group col-md-8">
+              <label for="studentname">Student Name</label>
+              <input type="text" class="form-control" id="studentname" aria-describedby="studentname" placeholder="Enter name">
             </div>
-            <label><strong>End Date</strong></label>
-            <div class="form-group row">
-              <input name = "schoolenddate" class="form-control input-date-sm" type="date">
+            <div class="form-group col-md-4">
+            <label for="studentgrade">Grade</label>
+            <select id="studentgrade" name="gradeselect" class="form-control">
+              <option selected></option>
+              <option class="student-grade-button" id = "0" value = "0">KG</option>
+              <option class="student-grade-button" id = "1" value = "1">1</option>
+              <option class="student-grade-button" id = "2" value = "2">2</option>
+              <option class="student-grade-button" id = "3" value = "3">3</option>
+              <option class="student-grade-button" id = "4" value = "4">4</option>
+              <option class="student-grade-button" id = "5" value = "5">5</option>
+              <option class="student-grade-button" id = "6" value = "6">6</option>
+              <option class="student-grade-button" id = "7" value = "7">7</option>
+              <option class="student-grade-button" id = "8" value = "8">8</option>
+              <option class="student-grade-button" id = "9" value = "9">9</option>
+              <option class="student-grade-button" id = "10" value = "10">10</option>
+              <option class="student-grade-button" id = "11" value = "11">11</option>
+              <option class="student-grade-button" id = "12" value = "12">12</option>
+            </select>
+          </div>
+          </div>
+          <div class = "row">
+            <div class="col">
+              <label for="studentphone">Student Phone</label>
+              <input type="text" class="form-control" id="studentphone" placeholder="Enter student's phone number">
+            </div>
+            <div class="col">
+              <label for="studentemail">Student Email</label>
+              <input type="email" class="form-control" id="studentemail" placeholder="Enter student's email ID">
+            </div>
+          </div>
+          <br>
+          <div class = "row">
+            <div class="col">
+              <label for="fathersemail">Fathers Email</label>
+              <input type="email" class="form-control" id="fathersemail" placeholder="Enter father's email ID">
+            </div>
+            <div class="col">
+              <label for="mothersemail">Mothers Email</label>
+              <input type="email" class="form-control" id="mothersemail" placeholder="Enter mother's email ID">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="studentaddbutton" class="btn btn-primary">Add Student</button>
+        </div>
+          <div class="addstudenterrormessage"></div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="list-addparents" role="tabpanel" aria-labelledby="list-addparent-list">
+
+        <div class = "container-fluid">
+
+
+        <div class = "modal-header">
+          <h6>Add Parent</h6>
+        </div>
+        <div class="modal-body">
+          <div class = "row">
+            <div class="col">
+              <label for="parentname">Name</label>
+              <input type="text" class="form-control" id="parentname" placeholder="Parent Name">
+            </div>
+            <div class="col">
+              <label for="parentemail">Email</label>
+              <input type="email" class="form-control" id="parentemail" placeholder="Parent Email">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="parentaddbutton" class="btn btn-primary">Add Parent</button>
+        </div>
+          <div class="addparenterrormessage"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+  <hr>
+<!--Staff Settings List Group-->
+<div class="row">
+
+  <div class="col-3">
+    <div class="list-group" id="list-tab" role="tablist">
+      <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Staff Options</h5>
+
+    </div>
+      <a class="list-group-item list-group-item-action" id="list-importteachers-list" data-toggle="list" href="#list-importteachers" role="tab" aria-controls="home">Import Teachers</a>
+      <a class="list-group-item list-group-item-action" id="list-addstaff-list" data-toggle="list" href="#list-addstaff" role="tab" aria-controls="profile">Add Staff</a>
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade" id="list-importteachers" role="tabpanel" aria-labelledby="list-importteachers-list">
+
+        <div class = "container-fluid">
+        <form method="post" action="{% url 'importteachers' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <h6>Teacher Data Import</h6>
+          <input class = "form-control-sm" id = 'teacherdata' name = "teacherdata" type="file"><br>
+          <label for="teacherdata"><small>&nbsp;&nbsp;Please use the template provided and ensure the file type is .xlsx</small></label>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id="teacherdataimportbutton" class="btn btn-primary">Upload</button>
+        </div>
+      </form>
+        </div>
+
+      </div>
+      <div class="tab-pane fade" id="list-addstaff" role="tabpanel" aria-labelledby="list-importaddstaff-list">
+
+        <div class = "container-fluid">
+
+        <div class="modal-body">
+          <h6>Add Staff</h6>
+          <div class = 'form-group'>
+            <div class="form-group">
+              <label for="stafftype">Staff Type</label>
+              <select id="stafftype" name="stafftype" class="form-control">
+                <option selected>...</option>
+                <option class="staffselectbutton" value = "teacher">Teacher</option>
+                <option class="staffselectbutton" value = "admin">Administrator</option>
+              </select>
+            </div>
+          </div>
+          <div class = "form-row">
+            <div class="form-group col-md-8">
+              <label for="staffname">Name</label>
+              <input type="text" class="form-control" id="staffname" aria-describedby="staffname" placeholder="Staff Name">
+            </div>
+            <div class="form-group col-md-4">
+            <label for="coordinatorselect">Coordinator</label>
+            <select id="coordinatorselect" name="coordinatorselect" class="form-control" disabled>
+              <option class="coordinatorselectbutton" value = "N" selected>No</option>
+              <option class="coordinatorselectbutton" value = "Y">Yes</option>
+            </select>
+          </div>
+          </div>
+          <div class = "row">
+            <div class="col">
+              <label for="staffphone">Phone</label>
+              <input type="text" class="form-control" id="staffphone" placeholder="Staff Phone Number">
+            </div>
+            <div class="col">
+              <label for="staffemail">Email</label>
+              <input type="email" class="form-control" id="staffemail" placeholder="Staff Email ID">
+            </div>
+          </div>
+          <br>
+          <div class = "form-group">
+            <div>
+              <label for="staffpassword">Password</label>
+              <input type="password" class="form-control" id="staffpassword" placeholder="Password">
+            </div>
+          </div>
+          <div class = "form-group">
+            <div>
+              <label for="grades">Grades</label>
+              <input type="email" class="form-control" id="grades" placeholder="Ex: 10,11,12" disabled>
+              <small>Only include if staff is a coordinator and use the following format: 10,11,12</small>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" id="savebutton" class="btn btn-primary">Save</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" id="addstaffbutton" class="btn btn-primary">Add Staff</button>
         </div>
-      </form>
+
+        </div>
+
+      </div>
+      <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
+      <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>
     </div>
   </div>
+</div>
+</div>
 </div>
 
-<!-- Student Settings Modal -->
-<div id = "studentsettingsmodal" class="modal modal-xl" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Settings</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form method="post" action="{% url 'importstudents' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-        <div class="modal-body">
-          <label for="studentdata">Student Data Import</label>
-          <input id = 'studentdata' name = "studentdata" type="file">
-        </div>
-        <div class="modal-footer">
-          <button type="submit" id="studentdatasavebutton" class="btn btn-primary">Save</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+<!--Adding Students and Parents-->
+<script>
+
+  $(document).ready(function () {
+
+  $('#studentaddbutton').click(function() {
+    $.ajax({
+      url:'/addstudent/',
+      method: 'post',
+      data: {
+        name: $("#studentname").val(),
+        grade: $('[name=gradeselect]').val(),
+        phone: $('#studentphone').val(),
+        email: $('#studentemail').val(),
+        femail: $('#fathersemail').val(),
+        memail: $('#mothersemail').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $('.addstudenterrormessage') = data['message']
+      }
+    });
+  });
+
+  $('#parentaddbutton').click(function() {
+    $.ajax({
+      url:'/addparent/',
+      method: 'post',
+      data: {
+        name: $("#parentname").val(),
+        email: $('#parentemail').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $('.addparenterrormessage') = data['message']
+      }
+    });
+  });
+
+  $('[name=stafftype]').change(function() {
+      if ($('[name=stafftype]').val() == 'teacher') {
+        $('[name=coordinatorselect]').removeAttr('disabled')
+      }
+      if ($('[name=stafftype]').val() == 'admin') {
+        $('[name=coordinatorselect]').attr('disabled','disabled')
+      }
+  });
+  $('[name=coordinatorselect]').change(function() {
+      if ($('[name=coordinatorselect]').val() == 'Y') {
+        $('#grades').removeAttr('disabled')
+      }
+      if ($('[name=coordinatorselect]').val() == 'N') {
+        $('#grades').attr('disabled','disabled')
+      }
+  });
+
+  $('#addstaffbutton').click(function() {
+
+    $.ajax({
+      url:'/addstaff/',
+      method: 'post',
+      data: {
+        stafftype: $('[name=stafftype]').val(),
+        name: $("#staffname").val(),
+        phone: $('#staffphone').val(),
+        email: $('#staffemail').val(),
+        coordinator: $('[name=coordinatorselect]').val(),
+        password: $('#staffpassword').val(),
+        grades: $('#grades').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log('Staff Added')
+      }
+    });
+  });
+
+});
+
+</script>
+
+
 
 </body>
 </html>

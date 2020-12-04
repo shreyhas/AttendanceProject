@@ -40,7 +40,13 @@ urlpatterns = [
     path('changedate/', staff.views.changedate, name="changedate"),
     path('changegrade/', staff.views.changegrade, name="changegrade"),
     path('export/', staff.views.export, name="export"),
-    path('savesettings/', staff.views.savesettings, name='savesettings'),
+    path('staff/schoolsettings/', settings.views.schoolsettings, name='schoolsettings'),
+    path('schooldatesettings/', settings.views.schooldatesettings, name='schooldatesettings'),
     path('importstudents/', settings.views.importstudents, name='importstudents'),
-    path('staff/schoolsettings/', settings.views.schoolsettings, name='schoolsettings')
+    path('importparents/', settings.views.importparents, name='importparents'),
+    path('importteachers/', settings.views.importteachers, name='importteachers'),
+    path('addparent/', settings.views.addparent, name='addparent'),
+    path('addstudent/', settings.views.addstudent, name='addstudent'),
+    path('addstaff/', settings.views.addstaff, name='addstaff'),
+
 ]
