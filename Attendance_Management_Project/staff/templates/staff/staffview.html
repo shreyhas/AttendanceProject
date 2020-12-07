@@ -10,8 +10,11 @@
   <script src="float-panel.js"></script>
 
   <!-- CSS Import -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="{% static 'bootstrap_4.0.0/css/bootstrap.css' %}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <link rel="stylesheet" href = "{% static 'css/highchartstyle.css' %}"
 
 
   <!-- jQuery, Popper, js import -->
@@ -19,6 +22,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="{% static 'bootstrap_4.0.0/js/bootstrap.min.js' %}"></script>
 
+  <!-- HighCharts Import  -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
   <script type="text/javascript">
     window.CSRF_TOKEN = "{{ csrf_token }}";
@@ -59,7 +66,7 @@ a { color: inherit; }
         <div class="dropdown-menu dropdown-menu-right">
         </div>
       </div>
-      <button type="button" class="btn bg-light" data-container="body" data-toggle="popover" data-trigger = "focus" data-placement="bottom" data-content = "Notifications Here">
+      <button type="button" class="btn bg-light" data-container="body" data-toggle="collapse" data-trigger = "focus" data-placement="bottom"  data-target="#notifications">
         <span class="material-icons">mail</span>
       </button>
       <button type="button" class="btn bg-light">
@@ -71,13 +78,41 @@ a { color: inherit; }
     </div>
   </div>
 </nav>
+
+<div class = "container-fluid">
+<div class="row justify-content-end">
+<div class = "col-3">
+  <div class = "collapse" id="notifications" style="z-index:10; position: absolute">
+    <div class = 'card card-body text-right'>
+      {% for request in requests %}
+      <div id="container-fluid">
+        <strong>
+          {% if request.request_type == 'gatepass' %}
+            Gate Pass for
+          {% else %}
+            Leave Request for
+          {% endif %}
+          {{request.studentref.name}}</strong><br>
+        Grade: {{request.studentref.grade}}<br>
+        From: {{request.parent_email}}<br>
+        Date: {{request.date}}<br>
+        <p></p>
+        <button class = 'deny-request btn btn-danger' id = 'deny{{request.id}}' value = '{{request.id}}'>Deny</button>
+        <button class = 'approve-request btn btn-primary' id = 'approve{{request.id}}' value = '{{request.id}}'>Approve</button>
+      </div>
+      <hr>
+      {% endfor %}
+      <br>
+    <button id = 'refreshnotifications' class = 'btn btn-secondary'>Refresh</button>
+    </div>
+  </div>
+</div>
+</div>
+  </div>
 <p></p>
 
 <div class="text-right">
   <div class="btn-group" role="group" aria-label="Features">
-    <button type="button" class="btn btn-sm bg-grey">
-      <span class = "material-icons">upload</span>
-    </button>
     <a href = "{% url 'schoolsettings' %}"<button type="button" class="btn btn-sm bg-grey">
       <span class = "material-icons">settings</span>
   </button></a>
@@ -105,6 +140,7 @@ a { color: inherit; }
     <div class="container-fluid">
     <div class="form-group row justify-content-center">
         <input class="form-control input-date" type="date" value="{{fdate}}" id="datepicker" name="datepicker">
+        &nbsp;&nbsp;<div class="spinner-border invisible" id="datechangespinner"></div>
     </div>
     </div>
     {% csrf_token %}
@@ -127,8 +163,9 @@ a { color: inherit; }
             <td>{{student.studentref.grade}}</td>
             <td>
                  <input id="student{{student.studentref.id}}" name = 'attendance' value = {{student.studentref.id}}
-                 type = 'checkbox' {% if student.attendance %} checked {% endif %}>
+                 type = 'checkbox' {% if student.attendance %} checked {% endif %} {% if student.on_leave %} disabled {% endif %}>
             </td>
+
           </tr>
         {% endfor %}
       </tbody>
@@ -163,14 +200,18 @@ a { color: inherit; }
         <option class="grade-button" id = "10" value = "10">10</option>
         <option class="grade-button" id = "11" value = "11">11</option>
         <option class="grade-button" id = "12" value = "12">12</option>
-        <option class="grade-button" id = "13" value = "13">All</option>
+        <option class="grade-button" id = "13" value = "13" selected>All</option>
       </select>
       </div>
     </div>
 
     <!-- Data Viz -->
     <div class = 'row'>
-      <div class = 'panel panel-default'>Attendance Policy Data Vizualization Here</div>
+      <figure class="highcharts-figure">
+      <div id="container"></div>
+      <p class="highcharts-description">
+      </p>
+      </figure>
     </div>
 
   </div>
@@ -272,6 +313,7 @@ a { color: inherit; }
 <script>
 $(document).ready(function () {
   $("#datepicker").change(function() {
+    $('#datechangespinner').removeClass("invisible")
     $.ajax({
       url:'/changedate/',
       method: 'post',
@@ -280,7 +322,9 @@ $(document).ready(function () {
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
+        $('#datechangespinner').addClass("invisible")
         $.fn.populatetable(data);
+        $.fn.highchart(data);
       }
     });
   });
@@ -296,21 +340,75 @@ $.fn.populatetable = function(data) {
     var studentref_id = student['studentref_id']
     var studentref_name = student['studentref_name']
     var studentref_grade = student['studentref_grade']
+    var on_leave = student['on_leave']
     var attendance = student['attendance']
     console.log(attendance);
     var checked_string = '';
     if(attendance){
       checked_string = 'checked';
     }
+    var on_leave_string = '';
+    if(on_leave){
+      on_leave_string = 'disabled'
+    }
     console.log(checked_string);
     $table +=   "<tr> <th scope = 'row'>" + studentref_id + "</th>\
                  <td>" + studentref_name + "</td>\
                  <td>" + studentref_grade + "</td>\
-                 <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + " > </td></tr>";
+                 <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + on_leave_string +" > </td></tr>";
   }
 
   $('#tbody').html($table)
 }
+
+$.fn.highchart = function(data) {
+    var chart = {
+                 plotBackgroundColor: null,
+                 plotBorderWidth: null,
+                 plotShadow: false
+              };
+              var title = {
+                 text: 'Present vs. Absent'
+              };
+              var tooltip = {
+                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              };
+              var plotOptions = {
+                 pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+
+                    dataLabels: {
+                       enabled: true,
+                       format: '<b>{point.name}%</b>: {point.percentage:.1f} %',
+                       style: {
+                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor)||
+                          'black'
+                       }
+                    }
+                 }
+              };
+              var series = [{
+                 type: 'pie',
+                 name: 'Present vs. Absent',
+                 data: [
+                    ['Present',   data['present']],
+                    {
+                       name: 'Absent',
+                       y: data['absent'],
+                       sliced: true,
+                       selected: true
+                    },
+                 ]
+              }];
+              var json = {};
+              json.chart = chart;
+              json.title = title;
+              json.tooltip = tooltip;
+              json.series = series;
+              json.plotOptions = plotOptions;
+              $('#container').highcharts(json);
+  }
 });
 
 </script>
@@ -332,6 +430,7 @@ $(document).ready(function () {
       success: function(data) {
         console.log(data)
         $.fn.populategradetable(data);
+        $.fn.highchart(data);
       }
     });
   });
@@ -345,26 +444,241 @@ $(document).ready(function () {
       var studentref_id = student['studentref_id']
       var studentref_name = student['studentref_name']
       var studentref_grade = student['studentref_grade']
+      var on_leave = student['on_leave']
       var attendance = student['attendance']
+      console.log(attendance);
       var checked_string = '';
-        if(attendance){
-          checked_string = 'checked';
-        }
+      if(attendance){
+        checked_string = 'checked';
+      }
+      var on_leave_string = '';
+      if(on_leave){
+        on_leave_string = 'disabled'
+      }
       $table +=   "<tr> <th scope = 'row'>" + studentref_id + "</th>\
                    <td>" + studentref_name + "</td>\
                    <td>" + studentref_grade + "</td>\
-                   <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + " > </td></tr>";
+                   <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + on_leave_string + " > </td></tr>";
 
     }
 
     $('#tbody').html($table)
   }
+
+  $.fn.highchart = function(data) {
+    var chart = {
+                 plotBackgroundColor: null,
+                 plotBorderWidth: null,
+                 plotShadow: false
+              };
+              var title = {
+                 text: 'Present vs. Absent'
+              };
+              var tooltip = {
+                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              };
+              var plotOptions = {
+                 pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+
+                    dataLabels: {
+                       enabled: true,
+                       format: '<b>{point.name}%</b>: {point.percentage:.1f} %',
+                       style: {
+                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor)||
+                          'black'
+                       }
+                    }
+                 }
+              };
+              var series = [{
+                 type: 'pie',
+                 name: 'Present vs. Absent',
+                 data: [
+                    ['Present',   data['present']],
+                    {
+                       name: 'Absent',
+                       y: data['absent'],
+                       sliced: true,
+                       selected: true
+                    },
+                 ]
+              }];
+              var json = {};
+              json.chart = chart;
+              json.title = title;
+              json.tooltip = tooltip;
+              json.series = series;
+              json.plotOptions = plotOptions;
+              $('#container').highcharts(json);
+  }
 });
 
 </script>
 
+<!-- HighCharts -->
+<script language = "JavaScript">
+         $(document).ready(function() {
+               var chart = {
+                 plotBackgroundColor: null,
+                 plotBorderWidth: null,
+                 plotShadow: false
+              };
+              var title = {
+                 text: 'Present vs. Absent'
+              };
+              var tooltip = {
+                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              };
+              var plotOptions = {
+                 pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+
+                    dataLabels: {
+                       enabled: true,
+                       format: '<b>{point.name}%</b>: {point.percentage:.1f} %',
+                       style: {
+                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor)||
+                          'black'
+                       }
+                    }
+                 }
+              };
+              var series = [{
+                 type: 'pie',
+                 name: 'Present vs. Absent',
+                 data: [
+                    ['Present',   {{present}}],
+                    {
+                       name: 'Absent',
+                       y: {{absent}},
+                       sliced: true,
+                       selected: true
+                    },
+                    ['On Leave', {{leave}}]
+                 ]
+              }];
+              var json = {};
+              json.chart = chart;
+              json.title = title;
+              json.tooltip = tooltip;
+              json.series = series;
+              json.plotOptions = plotOptions;
+              $('#container').highcharts(json);
+         });
+      </script>
+
+<!--Notifications-->
+
+<script>
+$(document).ready(function () {
+
+  $(document).on('click', '.approve-request', function() {
+    console.log('clicked');
+    console.log($(this).val());
+    $.ajax({
+      url:'/updaterequest/',
+      method: 'post',
+      data: {
+        rolename: '{{rolename|safe}}',
+        approved: true,
+        request_id: $(this).val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        id = data['id']
+        $('#approve'+id).attr('disabled','disabled')
+        $('#deny'+id).attr('disabled','disabled')
+      }
+    });
+
+  });
+
+  $(document).on('click', '.deny-request', function() {
+    console.log('deny clicked');
+    console.log($(this).val());
+    $.ajax({
+      url:'/updaterequest/',
+      method: 'post',
+      data: {
+        rolename: '{{rolename|safe}}',
+        approved: false,
+        request_id: $(this).val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        id = data['id']
+        $('#approve'+id).attr('disabled','disabled')
+        $('#deny'+id).attr('disabled','disabled')
+      }
+    });
+
+  });
 
 
+  $(document).on('click', '#refreshnotifications', function() {
+    console.log('refresh');
+    $.ajax({
+      url:'/notifications/',
+      method: 'post',
+      data: {
+        rolename: '{{rolename|safe}}',
+        user_id: 'user_id',
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        $.fn.refreshnotifications(data)
+
+      }
+    });
+
+  });
+
+  $.fn.refreshnotifications = function(data) {
+    $notifications = "<div class = 'card card-body text-right'>"
+    var requests = data['requests']
+    var studentinfo = data['studentinfo']
+    console.log(requests)
+    console.log(studentinfo)
+
+    for (i=0; i<requests.length; i++) {
+      var request = requests[i]
+      var student = studentinfo[i]
+      var request_id = request['id']
+      var type = request['request_type']
+      var date = request['date']
+      var parentemail = request['parent_email']
+      var typestring = ''
+      if (type == 'gatepass'){
+        typestring = 'Gate Pass for '
+      } else {
+        typestring = 'Leave Request for '
+      }
+
+      var name = student[0]
+      var grade = student[1]
+
+    $notifications += "<div id='container-fluid'><strong>"+ typestring + name +"</strong><br>\
+                        Grade: "+ grade +"<br>\
+                        From: "+ parentemail +"<br>\
+                        Date: "+ date +"<br>\
+                        <p></p>\
+                        <button class = 'deny-request btn btn-danger' type = 'button' id = 'deny"+ request_id +"' value = "+request_id+">Deny</button>\
+                        <button class = 'approve-request btn btn-primary' type = 'button' id = 'approve"+ request_id +"' value = "+request_id+">Approve</button>\
+                        </div><hr>"
+
+    }
+    $('#notifications').html($notifications + "<button id = 'refreshnotifications' class = 'btn btn-secondary'>Refresh</button></div>")
+  }
+
+
+});
+</script>
 
 </body>
 </html>

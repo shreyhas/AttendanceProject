@@ -37,9 +37,13 @@ urlpatterns = [
     path('save/<int:class_id>', classes.views.save, name="save"),
     path('record/', staff.views.record, name="record"),
     path('staff/classview/', staff.views.classview, name="classview"),
+    path('securityview/', staff.views.securityview, name="securityview"),
+    path('authorizerequest/', staff.views.authorizerequest, name="authorizerequest"),
     path('changedate/', staff.views.changedate, name="changedate"),
     path('changegrade/', staff.views.changegrade, name="changegrade"),
     path('export/', staff.views.export, name="export"),
+    path('updaterequest/', staff.views.updaterequest, name="updaterequest"),
+    path('notifications/', staff.views.notifications, name="notifications"),
     path('staff/schoolsettings/', settings.views.schoolsettings, name='schoolsettings'),
     path('schooldatesettings/', settings.views.schooldatesettings, name='schooldatesettings'),
     path('importstudents/', settings.views.importstudents, name='importstudents'),
@@ -48,5 +52,8 @@ urlpatterns = [
     path('addparent/', settings.views.addparent, name='addparent'),
     path('addstudent/', settings.views.addstudent, name='addstudent'),
     path('addstaff/', settings.views.addstaff, name='addstaff'),
+    path('addsubject/', settings.views.addsubject, name='addsubject'),
+    path('addclass/', settings.views.addclass, name='addclass'),
+    path('modifyclassstudent/', settings.views.modifyclassstudent, name='modifyclassstudent'),
 
 ]

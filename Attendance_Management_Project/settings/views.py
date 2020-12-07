@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from datetime import date, datetime, timedelta
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
@@ -22,23 +22,40 @@ def schoolsettings(request):
     today = date.today()
 
     formatted_date = datetime.today().strftime('%Y-%m-%d')
-    if request.user.is_superuser:
+    try:
+        if request.user.teacher.is_coordinator:
+            role = 'staff'
+            rolename = 'Coordinator'
+            name = request.user.teacher.name
+            subjects = Subject.objects.all()
+            teachers = Teacher.objects.all()
+        else:
+            return redirect('loginview')
+
+    except AttributeError:
         role = 'staff'
         rolename = 'Administrator'
         name = request.user.staff.name
+        subjects = Subject.objects.all()
+        teachers = Teacher.objects.all()
 
-        context = {'user_id': user_id,
-                   'user_name': user_name,
-                   'role': role,
-                   'rolename': rolename,
-                   'name': name,
-                   'date': today,
-                   'fdate': formatted_date,
-                   }
+    classes = ClassModel.objects.all()
+    students = Student.objects.all()
 
-        return render(request, 'staff/schoolsettings.html', context)
-    else:
-        return redirect('loginview')
+    context = {'user_id': user_id,
+               'user_name': user_name,
+               'role': role,
+               'rolename': rolename,
+               'name': name,
+               'date': today,
+               'fdate': formatted_date,
+               'subjects': subjects,
+               'teachers': teachers,
+               'classes': classes,
+               'students': students
+               }
+
+    return render(request, 'staff/schoolsettings.html', context)
 
 @login_required
 def schooldatesettings(request):
@@ -180,6 +197,7 @@ def addparent(request):
 
     return JsonResponse(response)
 
+@login_required
 def addstaff(request):
     if request.user.is_superuser:
         stafftype = request.POST.get('stafftype')
@@ -227,6 +245,83 @@ def addstaff(request):
     response = {}
     return JsonResponse(response)
 
+@login_required
+def addsubject(request):
+    name = request.POST.get('name')
+    print('created')
+    if not Subject.objects.filter(name = name).exists():
+        Subject.objects.create(
+            name = name
+        )
+    return JsonResponse({})
+
+@login_required
+def addclass(request):
+    subject_id = request.POST.get('subject')
+    grade = request.POST.get('grade')
+    block = request.POST.get('block')
+    teacher_id = request.POST.get('teacher')
+
+    subject = get_object_or_404(Subject, pk = subject_id)
+    teacher = get_object_or_404(Teacher, pk = teacher_id)
+
+    print(teacher)
+
+    if not ClassModel.objects.filter(grade = grade, subject = subject, block = block).exists():
+        classref = ClassModel.objects.create(
+                    grade = grade,
+                    subject = subject,
+                    block = block
+                )
+
+
+        if not TeacherClass.objects.filter(teacherref=teacher, classref=classref).exists():
+            TeacherClass.objects.create(
+                teacherref=teacher,
+                classref=classref
+            )
+
+
+
+
+    return JsonResponse({})
+
+@login_required
+def modifyclassstudent(request):
+    action = request.POST.get('action')
+    classref_id = request.POST.get('classref')
+    student_id = request.POST.get('student')
+
+
+    name = ''
+    error=''
+
+    if 'add' in action:
+        student = get_object_or_404(Student, pk=student_id)
+        classref = get_object_or_404(ClassModel, pk=classref_id)
+        if not ClassStudent.objects.filter(classref=classref,student=student).exists():
+
+            ClassStudent.objects.create(
+                classref = classref,
+                student = student
+            )
+            name = student.name
+
+    elif 'save' in action:
+        if (student_id is not '') and (classref_id is not ''):
+            student = get_object_or_404(Student, pk=student_id)
+            classref = get_object_or_404(ClassModel, pk=classref_id)
+            if not ClassStudent.objects.filter(classref=classref, student=student).exists():
+                ClassStudent.objects.create(
+                    classref=classref,
+                    student=student
+                )
+            name = student.name
+        else:
+            error = 'Please select a student to add first'
+
+    response = {'student': name, 'error': error}
+    return JsonResponse(response)
 
 def load_student_data():
 
@@ -258,7 +353,7 @@ def load_student_data():
 
 def load_parent_data():
 
-    filepath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'media  /Parent_Data.xlsx')
+    filepath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'media/Parent_Data.xlsx')
     parentdata = pd.read_excel(filepath)
     df = pd.DataFrame(parentdata)
 
@@ -278,10 +373,12 @@ def create_parent_student():
     for parent in Parent.objects.all():
         students = Student.objects.filter(fathers_email = parent.email) | Student.objects.filter(mothers_email = parent.email)
         for student in students:
-            ParentStudent.objects.create(
-                parentref = parent,
-                studentref = student
-            )
+            if not ParentStudent.objects.filter(parentref = parent, studentref = student).exists():
+
+                ParentStudent.objects.create(
+                    parentref = parent,
+                    studentref = student
+                )
 
 def load_teacher_data():
 

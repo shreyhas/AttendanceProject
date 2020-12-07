@@ -12,7 +12,7 @@ class Student(models.Model):
     mothers_email = models.EmailField(null=True)
 
     def __str__(self):
-        return f'{self.name} {self.grade}'
+        return f'{self.name}: Grade {self.grade}'
 
 class Subject(models.Model):
     name = models.CharField(max_length=15)
@@ -23,9 +23,10 @@ class Subject(models.Model):
 class ClassModel(models.Model):
     grade = models.IntegerField()
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    block = models.CharField(max_length=3, null = True)
 
     def __str__(self):
-        return f'{self.subject} for grade {self.grade}'
+        return f'{self.block} {self.subject} for grade {self.grade}'
 
 class ClassStudent(models.Model):
     classref = models.ForeignKey(ClassModel, on_delete=models.CASCADE)

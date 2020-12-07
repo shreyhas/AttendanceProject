@@ -74,6 +74,7 @@
 </nav>
 
 <div class = "container-fluid form-group">
+{% if request.user.is_superuser %}
   <hr>
 <!--School Settings List Group-->
 <div class="row">
@@ -270,13 +271,13 @@
       <h5 class="mb-1">Staff Options</h5>
 
     </div>
-      <a class="list-group-item list-group-item-action" id="list-importteachers-list" data-toggle="list" href="#list-importteachers" role="tab" aria-controls="home">Import Teachers</a>
+      <a class="list-group-item list-group-item-action active" id="list-importteachers-list" data-toggle="list" href="#list-importteachers" role="tab" aria-controls="home">Import Teachers</a>
       <a class="list-group-item list-group-item-action" id="list-addstaff-list" data-toggle="list" href="#list-addstaff" role="tab" aria-controls="profile">Add Staff</a>
     </div>
   </div>
   <div class="col-9">
     <div class="tab-content" id="nav-tabContent">
-      <div class="tab-pane fade" id="list-importteachers" role="tabpanel" aria-labelledby="list-importteachers-list">
+      <div class="tab-pane fade show active" id="list-importteachers" role="tabpanel" aria-labelledby="list-importteachers-list">
 
         <div class = "container-fluid">
         <form method="post" action="{% url 'importteachers' %}" enctype="multipart/form-data">
@@ -359,13 +360,180 @@
     </div>
   </div>
 </div>
+  <hr>
+{% endif %}
+<!--Class Settings List Group-->
+<div class="row">
+
+  <div class="col-3">
+    <div class="list-group" id="list-tab" role="tablist">
+      <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">Class Options</h5>
+
+    </div>
+      <a class="list-group-item list-group-item-action active" id="list-addsubjects-list" data-toggle="list" href="#list-addsubjects" role="tab" aria-controls="home">Add Subjects</a>
+      <a class="list-group-item list-group-item-action" id="list-addclass-list" data-toggle="list" href="#list-addclass" role="tab" aria-controls="home">Add Classes</a>
+      <a class="list-group-item list-group-item-action" id="list-assign-list" data-toggle="list" href="#list-assign" role="tab" aria-controls="home">Assign Students</a>
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="list-addsubjects" role="tabpanel" aria-labelledby="list-addsubjects-list">
+        <div class = "container-fluid">
+
+            <div class="modal-body">
+              <div class="form-group">
+                <label><strong>Add Subject</strong></label>
+                <div class="form-group">
+                    <label for="subjectname">Subject Name</label>
+                    <input type="text" class="form-control" id="subjectname" aria-describedby="subjectname" placeholder="Enter name of subject">
+                </div>
+                <small>Ex: Physics HL (Note: Don't include grade or block)</small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="addsubjectbutton" class="btn btn-primary">Add</button>
+            </div>
+
+        </div>
+      </div>
+      <div class="tab-pane fade" id="list-addclass" role="tabpanel" aria-labelledby="list-addclass-list">
+        <div class = "container-fluid">
+
+            <div class="modal-body">
+              <div class="form-group">
+                <label><strong>Add Class</strong></label>
+                <div class="form-row">
+                  <div class="form-group col-md-8">
+                    <label for="classsubject">Subject</label>
+                    <select id="classsubject" name="classsubjectselect" class="form-control">
+                      <option selected></option>
+                      {% for subject in subjects %}
+                        <option class="class-subject-button" id = "{{subject.name}}" value = "{{subject.id}}">{{subject.name}}</option>
+                      {% endfor %}
+                    </select>
+                    <small>If subjects don't appear please refresh the page</small>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="classgrade">Class Grade</label>
+                    <select id="classgrade" name="classgradeselect" class="form-control">
+                      <option selected></option>
+                      <option class="class-grade-button" id = "0" value = "0">KG</option>
+                      <option class="class-grade-button" id = "1" value = "1">1</option>
+                      <option class="class-grade-button" id = "2" value = "2">2</option>
+                      <option class="class-grade-button" id = "3" value = "3">3</option>
+                      <option class="class-grade-button" id = "4" value = "4">4</option>
+                      <option class="class-grade-button" id = "5" value = "5">5</option>
+                      <option class="class-grade-button" id = "6" value = "6">6</option>
+                      <option class="class-grade-button" id = "7" value = "7">7</option>
+                      <option class="class-grade-button" id = "8" value = "8">8</option>
+                      <option class="class-grade-button" id = "9" value = "9">9</option>
+                      <option class="class-grade-button" id = "10" value = "10">10</option>
+                      <option class="class-grade-button" id = "11" value = "11">11</option>
+                      <option class="class-grade-button" id = "12" value = "12">12</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="classblock">Block</label>
+                    <input id="classblock" name="classblock" class="form-control" type="text">
+                    <small>Ex. C6</small>
+                  </div>
+                  <div class="form-group col-md-8">
+                    <label for="classsubject">Teacher</label>
+                    <select id="classteacher" name="classteacherselect" class="form-control">
+                      <option selected></option>
+                      {% for teacher in teachers %}
+                        <option class="class-subject-button" id = "{{teacher.name}}" value = "{{teacher.id}}">{{teacher.name}}</option>
+                      {% endfor %}
+                    </select>
+                    <small>If teachers don't appear please refresh the page</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" id="addclassbutton" class="btn btn-primary">Add</button>
+            </div>
+
+        </div>
+      </div>
+      <div class="tab-pane fade" id="list-assign" role="tabpanel" aria-labelledby="list-assign-list">
+        <div class = "container-fluid">
+
+            <div class="modal-body">
+              <label><strong>Assign Students</strong></label>
+              <div class="form-group">
+                <label for="classdata">Select Class</label>
+                <select class = "form-control" id="classdata">
+                  {% for class in classes %}
+                    <option value = "{{class.id}}">{{class}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div id="addedstudents"></div><br>
+              <div class="form-group">
+                <label for="studentdatalist">Select Student</label>
+                <select id="studentdatalist" class = 'form-control'>
+                  {% for student in students %}
+                    <option value = "{{student.id}}">{{student}}</option>
+                  {% endfor %}
+                </select>
+                <div id="'errormessage"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button id="addclassstudentbutton" class="btn btn-primary">Save and Add Another</button>
+              <button id="saveclassstudentbutton" class="btn btn-primary">Save and Change Class</button>
+            </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 </div>
 
-<!--Adding Students and Parents-->
+
+<!--Adding Students, Parents, and Classes-->
 <script>
+$(document).ready(function () {
 
-  $(document).ready(function () {
+  $('#addsubjectbutton').click(function() {
+    console.log('triggered')
+    $.ajax({
+      url:'/addsubject/',
+      method: 'post',
+      data: {
+        name: $("#subjectname").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("#subjectname").val("")
+      }
+    });
+  });
+
+  $('#addclassbutton').click(function() {
+    console.log('triggered')
+    $.ajax({
+      url:'/addclass/',
+      method: 'post',
+      data: {
+        subject: $("[name=classsubjectselect]").val(),
+        grade: $("[name=classgradeselect]").val(),
+        teacher: $("[name=classteacherselect]").val(),
+        block: $("#classblock").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        $("[name=classsubjectselect]").val("")
+        $("[name=classgradeselect]").val("")
+        $("[name=classteacherselect]").val("")
+        $("#classblock").val("")
+      }
+    });
+  });
 
   $('#studentaddbutton').click(function() {
     $.ajax({
@@ -381,7 +549,12 @@
         csrfmiddlewaretoken: '{{ csrf_token }}'
       },
       success: function(data) {
-        $('.addstudenterrormessage') = data['message']
+        $("#studentname").val("")
+        $('[name=gradeselect]').val("")
+        $('#studentphone').val("")
+        $('#studentemail').val("")
+        $('#fathersemail').val("")
+        $('#mothersemail').val("")
       }
     });
   });
@@ -440,10 +613,60 @@
   });
 
 });
-
 </script>
 
+<script>
 
+$(document).ready(function () {
+
+  $('#addclassstudentbutton').click(function() {
+
+    console.log($('#classdata').val())
+
+    $.ajax({
+      url:'/modifyclassstudent/',
+      method: 'post',
+      data: {
+		action: 'add',
+		classref: $('#classdata').val(),
+        student: $("#studentdatalist").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        $('#classdata').attr('disabled', 'disabled')
+        $("#studentdatalist").val("")
+        if(data['student'] != ''){
+          $("#addedstudents").append('<span class="badge badge-primary">' + data['student'] + '</span>&nbsp;&nbsp;')
+        }
+      }
+    });
+  });
+
+   $('#saveclassstudentbutton').click(function() {
+
+    $.ajax({
+      url:'/modifyclassstudent/',
+      method: 'post',
+      data: {
+		action: 'save',
+		classref: $('#classdata').val(),
+        student: $("#studentdatalist").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        $('#classdata').removeAttr('disabled')
+        $('#classdata').val('')
+        $("#studentdatalist").val("")
+        $("#addedstudents").html("")
+      }
+    });
+  });
+
+});
+
+</script>
 
 </body>
 </html>

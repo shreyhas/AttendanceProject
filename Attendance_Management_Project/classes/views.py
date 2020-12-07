@@ -21,7 +21,7 @@ def classdetails(request, class_id, teacherclass_id):
         rolename = 'Administrator'
         name = request.user.staff.name
 
-
+    present, absent = present_absent_cs(classstudents)
     context = {
         'class_id': class_id,
         'class_name': class_name,
@@ -31,6 +31,8 @@ def classdetails(request, class_id, teacherclass_id):
         'name': name,
         'rolename': rolename,
         'user_id': user_id,
+        'present': present,
+        'absent': absent
     }
     return render(request, 'classes/classdetails.html', context)
 
@@ -50,3 +52,14 @@ def save(request, class_id):
         sc.save()
 
     return redirect('classview')
+
+def present_absent_cs(classstudents):
+    present = 0
+    absent = 0
+    for student in classstudents:
+        if student.attendance:
+            present += 1
+        else:
+            absent += 1
+
+    return present, absent

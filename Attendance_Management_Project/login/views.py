@@ -17,7 +17,11 @@ def login(request):
         )
         if user is not None:
             auth.login(request,user)
-            return redirect('loginview')
+            try:
+                if user.security is not None:
+                    return redirect('securityview')
+            except AttributeError:
+                return redirect('loginview')
         else:
             error = 'User not found'
             context = {
@@ -40,9 +44,14 @@ def requests(request):
             teacher_list.append(teacher)
 
     print(teacher_list)
+
+    formatted_date = datetime.today().strftime('%Y-%m-%d')
     context = {
-        'teacher': teacher_list
+        'teacher': teacher_list,
+        'fdate': formatted_date
     }
+
+
     return render(request, 'login/requests.html', context)
 
 def verifyemail(request):
@@ -107,6 +116,8 @@ def parentrequest(request):
     requestselect = request.POST.get('selectrequest')
     studentselect = request.POST.get('studentselectradio')
     coordinatorselect = request.POST.get('coordinatorselect')
+    date = request.POST.get('datepicker')
+    print(date)
 
     student = get_object_or_404(Student, pk = studentselect)
     coordinator = get_object_or_404(Teacher, pk = coordinatorselect)
@@ -115,7 +126,8 @@ def parentrequest(request):
         parent_email = parentemail,
         studentref = student,
         coordinatorref = coordinator,
-        request_type = requestselect
+        request_type = requestselect,
+        date = date
     )
 
     context = {

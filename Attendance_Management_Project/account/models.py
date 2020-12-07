@@ -25,6 +25,10 @@ class Staff(models.Model):
     name = models.CharField(max_length=30)
     phone = models.CharField(max_length=12)
     email = models.CharField(max_length=60)
+    verify_permissions = models.BooleanField(null=True, default=False)
 
     def __str__(self):
         return f'{self.name}'
+
+class Security(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)

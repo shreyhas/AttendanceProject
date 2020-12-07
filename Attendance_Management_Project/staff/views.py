@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.models import User
 from account.models import TeacherClass
 from classes.models import *
 from login.models import *
@@ -18,7 +19,10 @@ def loginview(request):
     today = date.today()
     attendancestudent = None
     classes = None
+    requests = None
     formatted_date = datetime.today().strftime('%Y-%m-%d')
+    present_as = 0
+    absent_as = 0
     try:
         if request.user.teacher is not None:
             role = 'teacher'
@@ -31,12 +35,25 @@ def loginview(request):
                 grades = request.user.teacher.grades.split(',')
                 for i in range(len(grades)):
                     grades[i] = int(grades[i])
-                attendancestudent = AttendanceStudent.objects.filter(studentref_grade__in = grades, date = today)
+                attendancestudent = AttendanceStudent.objects.filter(studentref_grade__in = grades, date = today).order_by('studentref_name')
+                requests = ParentRequest.objects.filter(
+                    coordinatorref = request.user.teacher,
+                    viewed_by_coordinator = False
+                )
+
     except AttributeError:
         role = 'staff'
         rolename = 'Administrator'
         name = request.user.staff.name
-        attendancestudent = AttendanceStudent.objects.filter(date = today)
+        attendancestudent = AttendanceStudent.objects.filter(date = today).order_by('studentref_name')
+        if request.user.staff.verify_permissions:
+            requests = ParentRequest.objects.filter(
+                approved_by_coordinator=True,
+                viewed_by_staff=False,
+                request_type='gatepass',
+                date=date.today()
+            )
+    present_as, absent_as, leave = present_absent_as(attendancestudent)
 
     context = {'user_id': user_id,
                'user_name': user_name,
@@ -46,7 +63,11 @@ def loginview(request):
                'classes': classes,
                'date': today,
                'fdate': formatted_date,
-               'attendancestudents': attendancestudent
+               'attendancestudents': attendancestudent,
+               'present': present_as,
+               'absent': absent_as,
+               'leave': leave,
+               'requests': requests
                }
     if role is 'staff':
         return render(request, 'staff/staffview.html', context)
@@ -63,7 +84,10 @@ def classview(request):
     formatted_date = datetime.today().strftime('%Y-%m-%d')
     try:
         if request.user.teacher is not None:
+            role = 'teacher'
+            rolename = 'Teacher'
             name = request.user.teacher.name
+            classes = TeacherClass.objects.filter(teacherref=request.user.teacher)
             attendancestudent = None
             if request.user.teacher.is_coordinator:
                 role = 'staff'
@@ -71,7 +95,8 @@ def classview(request):
                 grades = request.user.teacher.grades.split(',')
                 for i in range(len(grades)):
                     grades[i] = int(grades[i])
-                classes = TeacherClass.objects.filter(teacherref = request.user.teacher)
+                classrefs = ClassModel.objects.filter(grade__in = grades)
+                classes = TeacherClass.objects.filter(classref__in = classrefs)
     except AttributeError:
         role = 'staff'
         rolename = 'Administrator'
@@ -92,6 +117,30 @@ def classview(request):
     }
 
     return render(request, 'staff/classview.html', context)
+
+@login_required
+def securityview(request):
+
+    requests = ParentRequest.objects.filter(
+        approved_by_staff = True,
+        approved_by_coordinator = True,
+        request_type = 'gatepass',
+        date = date.today()
+    )
+    print(requests)
+    context = {'requests': requests}
+
+    return render(request, 'staff/securityview.html', context)
+
+@login_required
+def authorizerequest(request):
+    request_id = request.POST.get('request_id')
+    requestref = get_object_or_404(ParentRequest, pk=request_id)
+
+    requestref.delete()
+
+
+    return JsonResponse({'request_id':request_id})
 
 @login_required
 def record(request):
@@ -143,7 +192,7 @@ def changedate(request):
         name = request.user.staff.name
         attendancestudent = AttendanceStudent.objects.filter(date = date_selected)
 
-    #attendancestudent = list(attendancestudent)
+    present_as, absent_as, leave = present_absent_as(attendancestudent)
 
     for student in attendancestudent:
         #print(student.studentref.name)
@@ -157,6 +206,9 @@ def changedate(request):
         'rolename': rolename,
         'user_id': user_id,
         'date': today,
+        'present': present_as,
+        'absent': absent_as,
+        'leave': leave
     }
 
 
@@ -180,6 +232,17 @@ def changegrade(request):
         if request.user.teacher is not None:
             name = request.user.teacher.name
             attendancestudent = None
+            if request.user.teacher.is_coordinator:
+                rolename = 'Coordinator'
+                grades = request.user.teacher.grades.split(',')
+                for i in range(len(grades)):
+                    grades[i] = int(grades[i])
+                if grade_selected == 13:
+                    attendancestudent = AttendanceStudent.objects.filter(studentref_grade__in=grades, date=date_selected).order_by('studentref_name')
+                else:
+                    attendancestudent = AttendanceStudent.objects.filter(studentref_grade__in=grades, date=date_selected) & AttendanceStudent.objects.filter(studentref_grade=grade_selected, date=date_selected)
+
+
 
     except AttributeError:
         name = request.user.staff.name
@@ -202,12 +265,17 @@ def changegrade(request):
         student.studentref_grade = student.studentref.grade
         student.save()
 
+    present_as, absent_as, leave = present_absent_as(attendancestudent)
+
     context = {
         'attendancestudents': list(attendancestudent.values()),
         'name': name,
         'rolename': rolename,
         'user_id': user_id,
         'date': today,
+        'present': present_as,
+        'absent': absent_as,
+        'leave': leave
     }
 
     return JsonResponse(context)
@@ -298,6 +366,113 @@ def export(request):
 
     return response
 
+@login_required
+def notifications(request):
+
+    rolename = request.POST.get('rolename')
+
+    userobj = request.user
+
+    if 'Administrator' in rolename:
+        staff = userobj.staff
+        if staff.verify_permissions:
+            requests = ParentRequest.objects.filter(
+                approved_by_coordinator=True,
+                viewed_by_staff=False,
+                request_type='gatepass',
+            )
+    elif 'Coordinator' in rolename:
+        requests = ParentRequest.objects.filter(
+            coordinatorref=request.user.teacher,
+            viewed_by_coordinator=False,
+        )
+
+    studentinfo = []
+
+    for requestref in requests:
+        student_name = requestref.studentref.name
+        student_grade = requestref.studentref.grade
+        studentinfo.append((student_name,student_grade))
+
+    response  = {
+        'requests': list(requests.values()),
+        'studentinfo': studentinfo
+    }
+
+    return JsonResponse(response)
+
+@login_required
+def updaterequest(request):
+    rolename = request.POST.get('rolename')
+    approved = request.POST.get('approved')
+    if 'true' in approved:
+        approved = True
+    else:
+        approved = False
+    request_id = request.POST.get('request_id')
+
+    parentrequest = get_object_or_404(ParentRequest, pk=request_id)
+    request_type = parentrequest.request_type
+    date = parentrequest.date
+    studentref = parentrequest.studentref
+
+    if 'gatepass' in request_type:
+        if 'Coordinator' in rolename:
+            if approved:
+                parentrequest.approved_by_coordinator = True
+                parentrequest.viewed_by_coordinator = True
+                parentrequest.save()
+            else:
+                parentrequest.delete()
+        elif 'Administrator' in rolename:
+            if approved:
+                parentrequest.approved_by_staff = True
+                parentrequest.viewed_by_staff = True
+                parentrequest.save()
+            else:
+                parentrequest.delete()
+    if 'leaverequest' in request_type:
+        if 'Coordinator' in rolename:
+            if approved:
+                parentrequest.approved_by_coordinator = True
+                parentrequest.viewed_by_coordinator = True
+                parentrequest.save()
+                student_on_leave(studentref, date)
+
+            else:
+                parentrequest.delete()
 
 
+    return JsonResponse({'id':request_id})
 
+def present_absent_as(attendancestudent):
+    present_as = 0
+    absent_as = 0
+    leave = 0
+
+    if attendancestudent:
+
+        for student in attendancestudent:
+            print(student.attendance)
+            if student.attendance == False:
+                present_as += 1
+            else:
+                if student.on_leave:
+                    leave +=1
+                else:
+                    absent_as += 1
+        print(present_as,absent_as)
+
+    return present_as,absent_as,leave
+
+def student_on_leave(studentref, date):
+    student = AttendanceStudent.objects.filter(
+        studentref = studentref,
+        date = date
+    )
+    classstudent = ClassStudent.objects.filter(
+        student = studentref,
+        date = date
+    )
+    student.update(on_leave = True)
+    classstudent.update(on_leave = True)
