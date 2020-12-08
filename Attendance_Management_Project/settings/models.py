@@ -9,3 +9,6 @@ class StudentDataFileUpload(models.Model):
 class SchoolDates(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
+
+    def __str__(self):
+        return f'Starts: {self.start_date}, Ends: {self.end_date}'

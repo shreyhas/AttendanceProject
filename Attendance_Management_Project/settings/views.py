@@ -63,6 +63,16 @@ def schooldatesettings(request):
     if request.user.is_superuser:
         school_start_date = datetime.strptime(request.POST.get('schoolstartdate'), '%Y-%m-%d')
         school_end_date = datetime.strptime(request.POST.get('schoolenddate'),  '%Y-%m-%d')
+        if not SchoolDates.objects.all().exists():
+            SchoolDates.objects.create(
+                start_date = school_start_date,
+                end_date = school_end_date
+            )
+        elif SchoolDates.objects.all().exists():
+            schooldate = SchoolDates.objects.all()
+            schooldate.update(start_date = school_start_date,end_date = school_end_date)
+
+
         students = Student.objects.filter(active = True)
 
         days = int((school_end_date-school_start_date).days) + 1
@@ -80,6 +90,9 @@ def schooldatesettings(request):
                         attendance = False,
                         date = currentday
                     )
+
+        excessstudents = AttendanceStudent.objects.filter(date__gt = school_end_date)
+        excessstudents.delete()
 
         return redirect('schoolsettings')
     else:
@@ -101,7 +114,7 @@ def importstudents(request):
                 fs.save('Student_Data.xlsx', student_data_file)
 
             load_student_data()
-
+            create_attendance_student()
         return redirect('schoolsettings')
     else:
         return redirect('loginview')
@@ -158,10 +171,11 @@ def addstudent(request):
     email = request.POST.get('email')
     femail = request.POST.get('femail')
     memail = request.POST.get('memail')
+    response = {}
 
     if not Student.objects.filter(email = email).exists():
 
-        Student.objects.create(
+        student = Student.objects.create(
             name = name,
             grade = grade,
             phone = phone,
@@ -171,7 +185,9 @@ def addstudent(request):
         )
     else:
         response['message'] = 'Student already exists'
+
     create_parent_student()
+    create_attendance_student()
 
     response={}
 
@@ -417,3 +433,25 @@ def load_teacher_data():
 
 
     pass
+
+def create_attendance_student():
+    dates = SchoolDates.objects.all()[:1].get()
+    end_date = dates.end_date
+
+    students = Student.objects.all()
+
+    date_now = date.today()
+
+    days = int((end_date - date_now).days) + 1
+
+    for i in range(days):
+        for student in students:
+            currentday = date_now + timedelta(days=i)
+            if not AttendanceStudent.objects.filter(date=currentday, studentref=student).exists():
+                AttendanceStudent.objects.create(
+                    studentref=student,
+                    studentref_name=student.name,
+                    studentref_grade=student.grade,
+                    attendance=False,
+                    date=currentday
+                )
