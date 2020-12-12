@@ -55,5 +55,6 @@ urlpatterns = [
     path('addsubject/', settings.views.addsubject, name='addsubject'),
     path('addclass/', settings.views.addclass, name='addclass'),
     path('modifyclassstudent/', settings.views.modifyclassstudent, name='modifyclassstudent'),
+    path('schoolsettings/modify/', settings.views.modify, name='modify'),
 
 ]

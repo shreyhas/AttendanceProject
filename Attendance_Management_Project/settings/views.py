@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.forms.models import model_to_dict
 from datetime import date, datetime, timedelta
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
@@ -302,24 +303,90 @@ def addclass(request):
 
     return JsonResponse({})
 
+
+
+@login_required
+def modify(request):
+
+    action = request.POST.get('action')
+    user_to_change = request.POST.get('user_to_change')
+    is_student = False
+
+
+    if 's_or_p' in action:
+        if 's' in user_to_change:
+            is_student = True
+            sp = Student.objects.all()
+        elif 'p' in user_to_change:
+            sp = Parent.objects.all()
+
+        data = {
+            'isStudent': is_student,
+            'sp': list(sp.values()),
+        }
+
+    elif 'get_sp_data' in action:
+        user_selected = request.POST.get('user_selected')
+        if 's' in user_to_change:
+            is_student = True
+            spobj = Student.objects.get(pk=user_selected)
+        elif 'p' in user_to_change:
+            spobj = Parent.objects.get(pk=user_selected)
+        data = {
+            'isStudent': is_student,
+            'spobj': model_to_dict(spobj)
+        }
+
+    elif 'modify' in action:
+        user_selected = request.POST.get('user_selected')
+        phone = request.POST.get('phone')
+        print(phone)
+        email = request.POST.get('email')
+        femail = request.POST.get('femail')
+        memail = request.POST.get('memail')
+        if 's' in user_to_change:
+            is_student = True
+            student = Student.objects.get(pk=user_selected)
+
+
+            student.phone=phone
+            student.email=email
+            student.fathers_email=femail
+            student.mothers_email=memail
+            student.save()
+
+            create_parent_student()
+        elif 'p' in user_to_change:
+            spobj = Parent.objects.get(pk=user_selected)
+        data = {}
+    elif 'delete' in action:
+        user_selected = request.POST.get('user_selected')
+        if 's' in user_to_change:
+            spobj = Student.objects.get(pk=user_selected).delete()
+        elif 'p' in user_to_change:
+            spobj = Parent.objects.get(pk=user_selected).delete()
+        data = {}
+
+
+
+    return JsonResponse(data)
+
 @login_required
 def modifyclassstudent(request):
     action = request.POST.get('action')
     classref_id = request.POST.get('classref')
     student_id = request.POST.get('student')
 
-
     name = ''
-    error=''
+    error = ''
 
     if 'add' in action:
         student = get_object_or_404(Student, pk=student_id)
         classref = get_object_or_404(ClassModel, pk=classref_id)
-        if not ClassStudent.objects.filter(classref=classref,student=student).exists():
-
+        if not ClassStudent.objects.filter(classref=classref, student=student).exists():
             ClassStudent.objects.create(
-                classref = classref,
-                student = student
+                classref=classref,
+                student=student
             )
             name = student.name
 

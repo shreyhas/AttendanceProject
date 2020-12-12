@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <title>{% block title %}{{name}}{% endblock title %}</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Shreyhas Yachamaneni">
+  <script src="float-panel.js"></script>
+
+  <!-- CSS Import -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'bootstrap_4.0.0/css/bootstrap.css' %}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <link rel="stylesheet" href = "{% static 'css/highchartstyle.css' %}"
+
+
+  <!-- jQuery, Popper, js import -->
+  <script src="{% static 'jquery/jquery-3.5.1.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="{% static 'bootstrap_4.0.0/js/bootstrap.min.js' %}"></script>
+
+  <!-- HighCharts Import  -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+  <script type="text/javascript">
+    window.CSRF_TOKEN = "{{ csrf_token }}";
+  </script>
+
+  <style>
+  .vertical-align-middle {
+    vertical-align: middle;
+}
+a { color: inherit; }
+
+.padding-bottom-3 {
+    padding-bottom: 3px;
+}
+.input-date { width: 300px}
+.input-date-sm { width: 200px}
+
+
+
+  </style>
+</head>
+<body>
+{% block content %}
+{% endblock %}
+</body>
+</html>

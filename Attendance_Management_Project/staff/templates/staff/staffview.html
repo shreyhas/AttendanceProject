@@ -1,53 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  {% load static %}
-  <title>{{name}}</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="author" content="Shreyhas Yachamaneni">
-  <script src="float-panel.js"></script>
+{% extends 'base.html' %}
+{% load static %}
 
-  <!-- CSS Import -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{% static 'bootstrap_4.0.0/css/bootstrap.css' %}">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-  <link rel="stylesheet" href = "{% static 'css/highchartstyle.css' %}"
-
-
-  <!-- jQuery, Popper, js import -->
-  <script src="{% static 'jquery/jquery-3.5.1.min.js' %}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="{% static 'bootstrap_4.0.0/js/bootstrap.min.js' %}"></script>
-
-  <!-- HighCharts Import  -->
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-  <script src="https://code.highcharts.com/modules/exporting.js"></script>
-  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-
-  <script type="text/javascript">
-    window.CSRF_TOKEN = "{{ csrf_token }}";
-  </script>
-
-  <style>
-  .vertical-align-middle {
-    vertical-align: middle;
-}
-a { color: inherit; }
-
-.padding-bottom-3 {
-    padding-bottom: 3px;
-}
-.input-date { width: 300px}
-.input-date-sm { width: 200px}
-
-
-
-  </style>
-</head>
-<body>
+{% block content %}
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="{% url 'loginview' %}">
@@ -302,14 +256,7 @@ a { color: inherit; }
 </div>
 
 
-<!-- Popover Script -->
-<script>
-  $(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
-  });
-</script>
-
-<!-- Date Change JS -->
+<!-- Date and Grade Change JS -->
 <script>
 $(document).ready(function () {
   $("#datepicker").change(function() {
@@ -329,7 +276,25 @@ $(document).ready(function () {
     });
   });
 
-$.fn.populatetable = function(data) {
+  $('[name=gradeselect]').change(function() {
+    console.log($('[name=gradeselect]').val());
+    $.ajax({
+      url:'/changegrade/',
+      method: 'post',
+      data: {
+        date: $("#datepicker").val(),
+        grade: $('[name=gradeselect]').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        $.fn.populategradetable_grade(data);
+        $.fn.highchart_grade(data);
+      }
+    });
+  });
+
+  $.fn.populatetable = function(data) {
   console.log(data);
   students = data['attendancestudents'];
   $table = "";
@@ -360,110 +325,6 @@ $.fn.populatetable = function(data) {
 
   $('#tbody').html($table)
 }
-
-$.fn.highchart = function(data) {
-    var chart = {
-                 plotBackgroundColor: null,
-                 plotBorderWidth: null,
-                 plotShadow: false
-              };
-              var title = {
-                 text: 'Present vs. Absent'
-              };
-              var tooltip = {
-                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-              };
-              var plotOptions = {
-                 pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-
-                    dataLabels: {
-                       enabled: true,
-                       format: '<b>{point.name}%</b>: {point.percentage:.1f} %',
-                       style: {
-                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor)||
-                          'black'
-                       }
-                    }
-                 }
-              };
-              var series = [{
-                 type: 'pie',
-                 name: 'Present vs. Absent',
-                 data: [
-                    ['Present',   data['present']],
-                    {
-                       name: 'Absent',
-                       y: data['absent'],
-                       sliced: true,
-                       selected: true
-                    },
-                 ]
-              }];
-              var json = {};
-              json.chart = chart;
-              json.title = title;
-              json.tooltip = tooltip;
-              json.series = series;
-              json.plotOptions = plotOptions;
-              $('#container').highcharts(json);
-  }
-});
-
-</script>
-
-<!-- Grade Selector JS -->
-<script>
-$(document).ready(function () {
-
-  $('[name=gradeselect]').change(function() {
-    console.log($('[name=gradeselect]').val());
-    $.ajax({
-      url:'/changegrade/',
-      method: 'post',
-      data: {
-        date: $("#datepicker").val(),
-        grade: $('[name=gradeselect]').val(),
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-      },
-      success: function(data) {
-        console.log(data)
-        $.fn.populategradetable(data);
-        $.fn.highchart(data);
-      }
-    });
-  });
-
-  $.fn.populategradetable = function(data) {
-    students = data['attendancestudents'];
-    $table = " ";
-    for (i=0; i<students.length; i++) {
-
-      var student = students[i];
-      var studentref_id = student['studentref_id']
-      var studentref_name = student['studentref_name']
-      var studentref_grade = student['studentref_grade']
-      var on_leave = student['on_leave']
-      var attendance = student['attendance']
-      console.log(attendance);
-      var checked_string = '';
-      if(attendance){
-        checked_string = 'checked';
-      }
-      var on_leave_string = '';
-      if(on_leave){
-        on_leave_string = 'disabled'
-      }
-      $table +=   "<tr> <th scope = 'row'>" + studentref_id + "</th>\
-                   <td>" + studentref_name + "</td>\
-                   <td>" + studentref_grade + "</td>\
-                   <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + on_leave_string + " > </td></tr>";
-
-    }
-
-    $('#tbody').html($table)
-  }
 
   $.fn.highchart = function(data) {
     var chart = {
@@ -513,14 +374,39 @@ $(document).ready(function () {
               json.plotOptions = plotOptions;
               $('#container').highcharts(json);
   }
-});
 
-</script>
+  $.fn.populategradetable_grade = function(data) {
+    students = data['attendancestudents'];
+    $table = " ";
+    for (i=0; i<students.length; i++) {
 
-<!-- HighCharts -->
-<script language = "JavaScript">
-         $(document).ready(function() {
-               var chart = {
+      var student = students[i];
+      var studentref_id = student['studentref_id']
+      var studentref_name = student['studentref_name']
+      var studentref_grade = student['studentref_grade']
+      var on_leave = student['on_leave']
+      var attendance = student['attendance']
+      console.log(attendance);
+      var checked_string = '';
+      if(attendance){
+        checked_string = 'checked';
+      }
+      var on_leave_string = '';
+      if(on_leave){
+        on_leave_string = 'disabled'
+      }
+      $table +=   "<tr> <th scope = 'row'>" + studentref_id + "</th>\
+                   <td>" + studentref_name + "</td>\
+                   <td>" + studentref_grade + "</td>\
+                   <td> <input id= " + studentref_id + " name = 'attendance' value = " + studentref_id + " type = 'checkbox' " + checked_string + on_leave_string + " > </td></tr>";
+
+    }
+
+    $('#tbody').html($table)
+  }
+
+  $.fn.highchart_grade = function(data) {
+    var chart = {
                  plotBackgroundColor: null,
                  plotBorderWidth: null,
                  plotShadow: false
@@ -550,14 +436,13 @@ $(document).ready(function () {
                  type: 'pie',
                  name: 'Present vs. Absent',
                  data: [
-                    ['Present',   {{present}}],
+                    ['Present',   data['present']],
                     {
                        name: 'Absent',
-                       y: {{absent}},
+                       y: data['absent'],
                        sliced: true,
                        selected: true
                     },
-                    ['On Leave', {{leave}}]
                  ]
               }];
               var json = {};
@@ -567,8 +452,62 @@ $(document).ready(function () {
               json.series = series;
               json.plotOptions = plotOptions;
               $('#container').highcharts(json);
-         });
-      </script>
+  }
+});
+</script>
+
+<!-- HighCharts -->
+<script language = "JavaScript">
+$(document).ready(function() {
+     var chart = {
+       plotBackgroundColor: null,
+       plotBorderWidth: null,
+       plotShadow: false
+    };
+    var title = {
+       text: 'Present vs. Absent'
+    };
+    var tooltip = {
+       pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    };
+    var plotOptions = {
+       pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+
+          dataLabels: {
+             enabled: true,
+             format: '<b>{point.name}%</b>: {point.percentage:.1f} %',
+             style: {
+                color: (Highcharts.theme && Highcharts.theme.contrastTextColor)||
+                'black'
+             }
+          }
+       }
+    };
+    var series = [{
+       type: 'pie',
+       name: 'Present vs. Absent',
+       data: [
+          ['Present',   {{present}}],
+          {
+             name: 'Absent',
+             y: {{absent}},
+             sliced: true,
+             selected: true
+          },
+          ['On Leave', {{leave}}]
+       ]
+    }];
+    var json = {};
+    json.chart = chart;
+    json.title = title;
+    json.tooltip = tooltip;
+    json.series = series;
+    json.plotOptions = plotOptions;
+    $('#container').highcharts(json);
+});
+</script>
 
 <!--Notifications-->
 
@@ -618,7 +557,6 @@ $(document).ready(function () {
     });
 
   });
-
 
   $(document).on('click', '#refreshnotifications', function() {
     console.log('refresh');
@@ -676,10 +614,7 @@ $(document).ready(function () {
     $('#notifications').html($notifications + "<button id = 'refreshnotifications' class = 'btn btn-secondary'>Refresh</button></div>")
   }
 
-
 });
 </script>
-
-</body>
-</html>
+{% endblock content %}
 

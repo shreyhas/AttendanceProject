@@ -7,6 +7,8 @@ from account.models import TeacherClass
 from classes.models import *
 from login.models import *
 
+
+
 import io
 from xlsxwriter.workbook import Workbook
 
@@ -454,7 +456,7 @@ def present_absent_as(attendancestudent):
 
         for student in attendancestudent:
             print(student.attendance)
-            if student.attendance == False:
+            if student.attendance == True:
                 present_as += 1
             else:
                 if student.on_leave:
@@ -476,3 +478,15 @@ def student_on_leave(studentref, date):
     )
     student.update(on_leave = True)
     classstudent.update(on_leave = True)
+
+# @periodic_task(
+#     run_every=(crontab(minute='*/15')),
+#     name="task_generate_class_students",
+#     ignore_result=True
+# )
+def task_generate_class_students():
+
+    pass
+
+def generate_class_students():
+    pass
