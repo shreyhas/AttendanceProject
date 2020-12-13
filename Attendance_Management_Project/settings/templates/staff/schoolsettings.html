@@ -92,6 +92,7 @@ School Settings
     </div>
       <a class="list-group-item list-group-item-action active" id="list-importteachers-list" data-toggle="list" href="#list-importteachers" role="tab" aria-controls="home">Import Teachers</a>
       <a class="list-group-item list-group-item-action" id="list-addstaff-list" data-toggle="list" href="#list-addstaff" role="tab" aria-controls="profile">Add Staff</a>
+      <a class="list-group-item list-group-item-action" id="list-modifyst-list" data-toggle="list" href="#list-modifyst" role="tab" aria-controls="profile">Modify Staff</a>
     </div>
   </div>
   <div class="col-9">
@@ -174,8 +175,74 @@ School Settings
         </div>
 
       </div>
-      <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
-      <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>
+      <div class="tab-pane fade" id="list-modifyst" role="tabpanel" aria-labelledby="list-modifyst-list">
+
+        <div class = "container-fluid">
+
+        <div class="modal-body">
+          <h6>Add Staff</h6>
+          <div class = 'row'>
+            <div class="form-group col">
+              <label for="sttype">Staff Type</label>
+              <select id="sttype" name="sttype" class="form-control">
+                <option selected>...</option>
+                <option class="stselectbutton" value = "t">Teacher</option>
+                <option class="stselectbutton" value = "a">Administrator</option>
+              </select>
+            </div>
+            <div class = "form-group col">
+              <label for="stselect">Select Staff</label>
+              <select id = "stselect" name = "stselect" class = 'form-control' disabled>
+                <div id="populatestselect"></div>
+              </select>
+            </div>
+          </div>
+          <div class = "form-row">
+            <div class="form-group col-md-8">
+              <label for="stname">Name</label>
+              <input type="text" class="form-control" id="stname" aria-describedby="stname" placeholder="Staff Name" disabled>
+            </div>
+            <div class="form-group col-md-4">
+            <label for="stcoordinatorselect">Coordinator</label>
+            <select id="stcoordinatorselect" name="stcoordinatorselect" class="form-control" disabled>
+              <option class="stcoordinatorselectbutton" value = "N" selected>No</option>
+              <option class="stcoordinatorselectbutton" value = "Y">Yes</option>
+            </select>
+          </div>
+          </div>
+          <div class = "row">
+            <div class="col">
+              <label for="stphone">Phone</label>
+              <input type="text" class="form-control" id="stphone" placeholder="Staff Phone Number" disabled>
+            </div>
+            <div class="col">
+              <label for="stemail">Email</label>
+              <input type="email" class="form-control" id="stemail" placeholder="Staff Email ID" disabled>
+            </div>
+          </div>
+          <br>
+          <div class = "form-group">
+            <div>
+              <label for="stpassword">Change Password</label>
+              <input type="password" class="form-control" id="stpassword" placeholder="Password" disabled>
+            </div>
+          </div>
+          <div class = "form-group">
+            <div>
+              <label for="stgrades">Grades</label>
+              <input type="email" class="form-control" id="stgrades" placeholder="Ex: 10,11,12" disabled>
+              <small>Only include if staff is a coordinator and use the following format: 10,11,12</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="stdeletebutton" class="btn btn-primary">Delete</button>
+          <button type="button" id="stmodifybutton" class="btn btn-primary">Modify</button>
+        </div>
+
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -843,6 +910,7 @@ $(document).ready(function () {
 
 
   });
+
   $('#spdeletebutton').on('click',function (){
 
     console.log('delete')
@@ -870,6 +938,171 @@ $(document).ready(function () {
         $('#spmothersemail').attr('disabled','disabled')
         $('#spfathersemail').val('')
         $('#spfathersemail').attr('disabled','disabled')
+      }
+    });
+
+
+  });
+
+  //modify staff
+
+  $('[name=sttype]').on('change',function () {
+
+    console.log($('#sttype').val())
+
+    $.ajax({
+      url: '/schoolsettings/modify/',
+      method: 'post',
+      data: {
+        action: 't_or_a',
+        user_to_change: $('#sttype').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function (data) {
+        console.log(data)
+        $('#stselect').removeAttr('disabled')
+
+        if (data['isTeacher']){
+          $('#stname').removeAttr('disabled')
+          $('#stemail').removeAttr('disabled')
+          $('#stgrades').removeAttr('disabled')
+          $('#stphone').removeAttr('disabled')
+          $('#stcoordinatorselect').removeAttr('disabled')
+          var st = data['st']
+          $stoptions = '<option selected>...</option>'
+          for (i=0;i<st.length;i++) {
+            stobj = st[i]
+            var st_id = stobj['id']
+            var st_name = stobj['name']
+            $stoptions+='<option value="'+ st_id +'">' + st_name + '</option>'
+          }
+        } else {
+          $('#stname').removeAttr('disabled')
+          $('#stemail').removeAttr('disabled')
+          $('#stphone').attr('disabled','disabled')
+          var st = data['st']
+          $stoptions = '<option selected>...</option>'
+          for (i=0;i<st.length;i++) {
+            stobj = st[i]
+            var st_id = stobj['id']
+            var st_name = stobj['name']
+            $stoptions+='<option value="'+ st_id +'">' + st_name + '</option>'
+          }
+        }
+
+        $('#stselect').html($stoptions)
+
+      }
+    });
+  });
+
+  $('#stselect').on('change',function (){
+
+    console.log('selected')
+    console.log()
+    $.ajax({
+      url: '/schoolsettings/modify/',
+      method: 'post',
+      data: {
+        action: 'get_st_data',
+        user_to_change: $('#sttype').val(),
+        user_selected: $('[name=stselect]').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function (data) {
+        console.log(data)
+        st = data['stobj']
+        var isCoordinator = st['is_coordinator']
+        var val = 'N'
+        console.log(isCoordinator)
+        if(isCoordinator) {
+          val = 'Y'
+        } else {
+          val = 'N'
+        }
+        console.log(val)
+        if (data['isTeacher']) {
+          $('#stname').val(st['name'])
+          $('#stemail').val(st['email'])
+          $('#stphone').val(st['phone'])
+          $('#stcoordinatorselect').val(val)
+          $('#stgrades').val(st['grades'])
+
+        } else {
+          $('#stname').val(st['name'])
+          $('#stemail').val(st['email'])
+          $('#stphone').val(st['phone'])
+        }
+      }
+    });
+
+
+  });
+
+  $('#spmodifybutton').on('click',function (){
+
+    console.log('modify')
+    $.ajax({
+      url: '/schoolsettings/modify/',
+      method: 'post',
+      data: {
+        action: 'modify',
+        user_to_change: $('#sttype').val(),
+        user_selected: $('#stselect').val(),
+        name: $('#stname').val(),
+        email: $('#stemail').val(),
+        grades: $('#stgrades').val(),
+        phone: $('#stphone').val(),
+        is_coordinator: $('#stcoordinatorselect').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function (data) {
+        console.log(data)
+        sp = data['spobj']
+        $('#sttype').val('')
+        $('#stselect').val('')
+        $('#stselect').attr('disabled', 'disabled')
+        $('#stname').val('')
+        $('#stname').attr('disabled','disabled')
+        $('#stemail').val('')
+        $('#stemail').attr('disabled','disabled')
+        $('#stgrades').val('')
+        $('#stgrades').attr('disabled','disabled')
+        $('#stphone').val('')
+        $('#stphone').attr('disabled','disabled')
+
+      }
+    });
+
+
+  });
+
+  $('#stdeletebutton').on('click',function (){
+
+    console.log('deletestaff')
+    $.ajax({
+      url: '/schoolsettings/modify/',
+      method: 'post',
+      data: {
+        action: 'deletestaff',
+        user_to_change: $('#sttype').val(),
+        user_selected: $('#stselect').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function (data) {
+        console.log('deleted')
+        $('#sttype').val('')
+        $('#stselect').val('')
+        $('#stselect').attr('disabled', 'disabled')
+        $('#stname').val('')
+        $('#stname').attr('disabled','disabled')
+        $('#stemail').val('')
+        $('#stemail').attr('disabled','disabled')
+        $('#stgrades').val('')
+        $('#stgrades').attr('disabled','disabled')
+        $('#stphone').val('')
+        $('#stphone').attr('disabled','disabled')
+
       }
     });
 

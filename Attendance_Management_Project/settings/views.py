@@ -311,6 +311,7 @@ def modify(request):
     action = request.POST.get('action')
     user_to_change = request.POST.get('user_to_change')
     is_student = False
+    is_teacher = False
 
 
     if 's_or_p' in action:
@@ -325,6 +326,18 @@ def modify(request):
             'sp': list(sp.values()),
         }
 
+    elif 't_or_a' in action:
+        if 't' in user_to_change:
+            is_teacher = True
+            st = Teacher.objects.all()
+        elif 'a' in user_to_change:
+            st = Staff.objects.all()
+        print(st)
+        data = {
+            'isTeacher': is_teacher,
+            'st': list(st.values()),
+        }
+
     elif 'get_sp_data' in action:
         user_selected = request.POST.get('user_selected')
         if 's' in user_to_change:
@@ -337,15 +350,28 @@ def modify(request):
             'spobj': model_to_dict(spobj)
         }
 
+    elif 'get_st_data' in action:
+        user_selected = request.POST.get('user_selected')
+        if 't' in user_to_change:
+            is_teacher = True
+            stobj = Teacher.objects.get(pk=user_selected)
+        elif 'a' in user_to_change:
+            stobj = Staff.objects.get(pk=user_selected)
+        data = {
+            'isTeacher': is_teacher,
+            'stobj': model_to_dict(stobj)
+        }
+
     elif 'modify' in action:
         user_selected = request.POST.get('user_selected')
-        phone = request.POST.get('phone')
-        print(phone)
-        email = request.POST.get('email')
-        femail = request.POST.get('femail')
-        memail = request.POST.get('memail')
+
         if 's' in user_to_change:
             is_student = True
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            femail = request.POST.get('femail')
+            memail = request.POST.get('memail')
             student = Student.objects.get(pk=user_selected)
 
 
@@ -356,9 +382,29 @@ def modify(request):
             student.save()
 
             create_parent_student()
+
         elif 'p' in user_to_change:
-            spobj = Parent.objects.get(pk=user_selected)
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+
+            parent = Parent.objects.get(pk=user_selected)
+            parent.name = name
+            parent.email = email
+            parent.save()
+
+            create_parent_student()
+        elif 't' in user_to_change:
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            grades = request.POST.get('grades')
+            email = request.POST.get('email')
+            email = request.POST.get('email')
+        elif 'a' in user_to_change:
+            pass
+
         data = {}
+
     elif 'delete' in action:
         user_selected = request.POST.get('user_selected')
         if 's' in user_to_change:
