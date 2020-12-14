@@ -56,13 +56,13 @@ def requests(request):
 
 def verifyemail(request):
     email = request.POST.get('email')
+    print(type(email))
 
     parents = Parent.objects.filter(email = email)
     response = {}
 
     if (len(list(parents))>0):
         otp = random.randrange(100000, 1000000, 1)
-        print(otp)
         response['result'] = True
         response['message'] = 'E-Mail ID verified'
         send_mail(

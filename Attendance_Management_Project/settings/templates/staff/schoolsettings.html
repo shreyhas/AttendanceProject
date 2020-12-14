@@ -729,6 +729,30 @@ $(document).ready(function () {
 
 $(document).ready(function () {
 
+  $('#classdata').on('change', function () {
+    $("#addedstudents").html('')
+    $.ajax({
+      url:'/modifyclassstudent/',
+      method: 'post',
+      data: {
+		action: 'load',
+		classref: $('#classdata').val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      success: function(data) {
+        console.log(data)
+        students = data['students']
+        for ( i=0; i<students.length;i++){
+          student = students[i]
+          var name = student['name']
+
+          $("#addedstudents").append('<span class="badge badge-primary">' + name + '</span>&nbsp;&nbsp;')
+        }
+      }
+    });
+
+  });
+
   $('#addclassstudentbutton').click(function() {
 
     console.log($('#classdata').val())
@@ -753,7 +777,7 @@ $(document).ready(function () {
     });
   });
 
-   $('#saveclassstudentbutton').click(function() {
+  $('#saveclassstudentbutton').click(function() {
 
     $.ajax({
       url:'/modifyclassstudent/',
@@ -766,10 +790,18 @@ $(document).ready(function () {
       },
       success: function(data) {
         console.log(data)
-        $('#classdata').removeAttr('disabled')
-        $('#classdata').val('')
+        $('#classdata').attr('disabled', 'disabled')
         $("#studentdatalist").val("")
-        $("#addedstudents").html("")
+        if(data['student'] != ''){
+          $("#addedstudents").append('<span class="badge badge-primary">' + data['student'] + '</span>&nbsp;&nbsp;')
+        }
+        setTimeout(function(){
+          $('#classdata').removeAttr('disabled')
+          $('#classdata').val('')
+          $("#studentdatalist").val("")
+          $("#addedstudents").html("")
+        },700);
+
       }
     });
   });

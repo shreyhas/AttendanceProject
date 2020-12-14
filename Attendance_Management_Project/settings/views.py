@@ -425,6 +425,7 @@ def modifyclassstudent(request):
 
     name = ''
     error = ''
+    students = []
 
     if 'add' in action:
         student = get_object_or_404(Student, pk=student_id)
@@ -435,6 +436,7 @@ def modifyclassstudent(request):
                 student=student
             )
             name = student.name
+        response = {'student': name, 'error': error}
 
     elif 'save' in action:
         if (student_id is not '') and (classref_id is not ''):
@@ -449,7 +451,16 @@ def modifyclassstudent(request):
         else:
             error = 'Please select a student to add first'
 
-    response = {'student': name, 'error': error}
+        response = {'student': name, 'error': error}
+    elif 'load' in action:
+        classref = get_object_or_404(ClassModel, pk=classref_id)
+        cs = ClassStudent.objects.filter(classref = classref)
+        for student in cs:
+            studentobj = Student.objects.get(pk=student.student_id)
+            students.append(model_to_dict(studentobj))
+        response = {'students': list(students)}
+
+
     return JsonResponse(response)
 
 def load_student_data():

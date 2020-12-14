@@ -69,10 +69,12 @@
   <div class="btn-group" role="group" aria-label="Features">
     <a href = "{% url 'schoolsettings' %}"<button type="button" class="btn btn-sm bg-grey">
       <span class = "material-icons">settings</span>
-  </button></a>
+    </button></a>
+    {% if not request.user.teacher %}
     <button type="button" class="btn btn-sm bg-grey" data-toggle="modal" data-target="#exportmodal">
       <span class = "material-icons">download</span>
     </button>
+    {% endif %}
     <a href="{% url 'classview' %}"><button type="button" class="btn btn-sm bg-grey">
       <span class = "material-icons">book</span>
     </button></a>
@@ -164,6 +166,7 @@
       <figure class="highcharts-figure">
       <div id="container"></div>
       <p class="highcharts-description">
+        Present: {{present}}  Absent: {{absent}}
       </p>
       </figure>
     </div>

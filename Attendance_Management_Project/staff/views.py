@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 from account.models import TeacherClass
+from django.core.mail import send_mail
 from classes.models import *
 from login.models import *
 
@@ -25,6 +26,7 @@ def loginview(request):
     formatted_date = datetime.today().strftime('%Y-%m-%d')
     present_as = 0
     absent_as = 0
+    disabled = False
     try:
         if request.user.teacher is not None:
             role = 'teacher'
@@ -38,6 +40,7 @@ def loginview(request):
                 for i in range(len(grades)):
                     grades[i] = int(grades[i])
                 attendancestudent = AttendanceStudent.objects.filter(studentref_grade__in = grades, date = today).order_by('studentref_name')
+                #if datetime.now()>
                 requests = ParentRequest.objects.filter(
                     coordinatorref = request.user.teacher,
                     viewed_by_coordinator = False
@@ -70,7 +73,7 @@ def loginview(request):
                'absent': absent_as,
                'leave': leave,
                'requests': requests
-               }
+    }
     if role is 'staff':
         return render(request, 'staff/staffview.html', context)
 
@@ -159,6 +162,17 @@ def record(request):
             present_absent = True
         else:
             present_absent = False
+            parentstudents = ParentStudent.objects.filter(studentref = student.studentref)
+            to_emails = []
+            for ps in parentstudents:
+                to_emails.append(ps.parentref.email)
+            send_mail(
+                subject=f'Student Attendance: {student.studentref.name}',
+                message=f'Your student, {student.studentref.name} was marked absent for the day',
+                from_email='fyberboard@gmail.com',
+                recipient_list=to_emails,
+                fail_silently=False
+            )
 
         student.attendance = present_absent
         student.save()

@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from account.models import TeacherClass
+from django.core.mail import send_mail
 from .models import *
+from login.models import *
 # Create your views here.
 
 @login_required
@@ -49,6 +51,18 @@ def save(request, class_id):
             sc.attendance = True
         else:
             sc.attendance = False
+            student = sc
+            parentstudents = ParentStudent.objects.filter(studentref=student.student)
+            to_emails = []
+            for ps in parentstudents:
+                to_emails.append(ps.parentref.email)
+            send_mail(
+                subject=f'Student Attendance: {student.student.name}',
+                message=f'Your student, {student.student.name} was marked absent for the class {sc.classref}',
+                from_email='fyberboard@gmail.com',
+                recipient_list=to_emails,
+                fail_silently=False
+            )
         sc.save()
 
     return redirect('classview')
