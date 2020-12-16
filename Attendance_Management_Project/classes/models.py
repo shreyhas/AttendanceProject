@@ -22,11 +22,18 @@ class Subject(models.Model):
 
 class ClassModel(models.Model):
     grade = models.IntegerField()
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    block = models.CharField(max_length=3, null = True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
+    block = models.CharField(max_length=3, blank = True, null=True)
+    section = models.CharField(max_length=2, null=True, blank=True)
+    is_homeroom = models.BooleanField(null=True, default=False)
 
     def __str__(self):
-        return f'{self.block} {self.subject} for grade {self.grade}'
+        if(self.is_homeroom):
+            return f'{self.grade}{self.section}'
+        else:
+            return f'{self.block} {self.subject} for grade {self.grade}'
+
+
 
 class ClassStudent(models.Model):
     classref = models.ForeignKey(ClassModel, on_delete=models.CASCADE)
@@ -34,6 +41,7 @@ class ClassStudent(models.Model):
     attendance = models.BooleanField(default=False)
     date = models.DateField(default=datetime.today(), null=True)
     on_leave = models.BooleanField(null = True, default=False)
+    is_homeroomclassstudent = models.BooleanField(null=True, default=False)
     def __str__(self):
         return f'{self.student} in {self.classref}'
 

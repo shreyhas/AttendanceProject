@@ -21,9 +21,6 @@ EMAIL_HOST_PASSWORD = 'fyberboard@123$'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
-
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,6 +52,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'staff.apps.StaffConfig',
     'settings.apps.SettingsConfig',
+
 ]
 
 MIDDLEWARE = [

@@ -7,3 +7,5 @@ admin.site.register(ClassModel)
 admin.site.register(Subject)
 admin.site.register(ClassStudent)
 admin.site.register(AttendanceStudent)
+
+

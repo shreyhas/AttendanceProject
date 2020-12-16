@@ -278,32 +278,46 @@ def addclass(request):
     grade = request.POST.get('grade')
     block = request.POST.get('block')
     teacher_id = request.POST.get('teacher')
+    type = request.POST.get('type')
+    section = request.POST.get('section')
 
-    subject = get_object_or_404(Subject, pk = subject_id)
     teacher = get_object_or_404(Teacher, pk = teacher_id)
 
-    print(teacher)
+    print(grade)
 
-    if not ClassModel.objects.filter(grade = grade, subject = subject, block = block).exists():
-        classref = ClassModel.objects.create(
-                    grade = grade,
-                    subject = subject,
-                    block = block
-                )
-
-
-        if not TeacherClass.objects.filter(teacherref=teacher, classref=classref).exists():
-            TeacherClass.objects.create(
-                teacherref=teacher,
-                classref=classref
+    if 'homeroom' in type:
+        if not ClassModel.objects.filter(grade=grade, section=section).exists():
+            classref = ClassModel.objects.create(
+                grade=grade,
+                section=section,
+                is_homeroom=True
             )
+
+            if not TeacherClass.objects.filter(teacherref=teacher, classref=classref).exists():
+                TeacherClass.objects.create(
+                    teacherref=teacher,
+                    classref=classref
+                )
+    else:
+        subject = get_object_or_404(Subject, pk=subject_id)
+        if not ClassModel.objects.filter(grade = grade, subject = subject, block = block).exists():
+            classref = ClassModel.objects.create(
+                        grade = grade,
+                        subject = subject,
+                        block = block
+                    )
+
+
+            if not TeacherClass.objects.filter(teacherref=teacher, classref=classref).exists():
+                TeacherClass.objects.create(
+                    teacherref=teacher,
+                    classref=classref
+                )
 
 
 
 
     return JsonResponse({})
-
-
 
 @login_required
 def modify(request):
@@ -431,11 +445,19 @@ def modifyclassstudent(request):
         student = get_object_or_404(Student, pk=student_id)
         classref = get_object_or_404(ClassModel, pk=classref_id)
         if not ClassStudent.objects.filter(classref=classref, student=student).exists():
-            ClassStudent.objects.create(
-                classref=classref,
-                student=student
-            )
-            name = student.name
+            if classref.is_homeroom:
+                ClassStudent.objects.create(
+                    classref=classref,
+                    student=student,
+                    is_homeroomclassstudent = True
+                )
+                name = student.name
+            else:
+                ClassStudent.objects.create(
+                    classref=classref,
+                    student=student
+                )
+                name = student.name
         response = {'student': name, 'error': error}
 
     elif 'save' in action:
@@ -443,11 +465,19 @@ def modifyclassstudent(request):
             student = get_object_or_404(Student, pk=student_id)
             classref = get_object_or_404(ClassModel, pk=classref_id)
             if not ClassStudent.objects.filter(classref=classref, student=student).exists():
-                ClassStudent.objects.create(
-                    classref=classref,
-                    student=student
-                )
-            name = student.name
+                if classref.is_homeroom:
+                    ClassStudent.objects.create(
+                        classref=classref,
+                        student=student,
+                        is_homeroomclassstudent=True
+                    )
+                    name = student.name
+                else:
+                    ClassStudent.objects.create(
+                        classref=classref,
+                        student=student
+                    )
+                    name = student.name
         else:
             error = 'Please select a student to add first'
 

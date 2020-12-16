@@ -49,8 +49,16 @@ def save(request, class_id):
     for sc in studentclasses:
         if sc.student.id in marked:
             sc.attendance = True
+            if sc.is_homeroomclassstudent:
+                studentref = sc.student
+                attendancestudent = AttendanceStudent.objects.filter(date=sc.date, studentref=studentref)
+                attendancestudent.update(attendance=True)
         else:
             sc.attendance = False
+            if sc.is_homeroomclassstudent:
+                studentref = sc.student
+                attendancestudent = AttendanceStudent.objects.filter(date=sc.date, studentref=studentref)
+                attendancestudent.update(attendance=False)
             student = sc
             parentstudents = ParentStudent.objects.filter(studentref=student.student)
             to_emails = []
@@ -63,6 +71,7 @@ def save(request, class_id):
                 recipient_list=to_emails,
                 fail_silently=False
             )
+
         sc.save()
 
     return redirect('classview')

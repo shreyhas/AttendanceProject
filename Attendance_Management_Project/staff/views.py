@@ -46,6 +46,7 @@ def loginview(request):
                     viewed_by_coordinator = False
                 )
 
+
     except AttributeError:
         role = 'staff'
         rolename = 'Administrator'
